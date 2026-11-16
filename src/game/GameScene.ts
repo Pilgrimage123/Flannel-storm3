@@ -1037,6 +1037,10 @@ export class GameScene extends Phaser.Scene {
     if (honorIFrame && this.iFrame > 0) return;
     this.hp -= amount;
     this.iFrame = 0.45;
+    this.player.setTintFill(0xffffff);
+    this.time.delayedCall(60, () => {
+      if (this.alive && this.beerRage <= 0) this.player.clearTint();
+    });
     this.fxSystem.floater(this.player.x, this.player.y - 24, `-${Math.round(amount)}`, "#ff4d4d");
     synth.hurt();
     if (this.shakeOn) this.cameras.main.shake(100, 0.009);

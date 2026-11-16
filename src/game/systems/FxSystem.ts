@@ -16,12 +16,12 @@ export class FxSystem {
     for (let i = 0; i < 60; i++) {
       const t = this.scene.add
         .text(0, 0, "", {
-          fontFamily: "Courier New, monospace",
-          fontSize: "16px",
+          fontFamily: '"Press Start 2P", monospace',
+          fontSize: "11px",
           fontStyle: "bold",
           color: "#ffe66d",
           stroke: "#140e06",
-          strokeThickness: 4,
+          strokeThickness: 3,
         })
         .setActive(false)
         .setVisible(false)
@@ -53,9 +53,9 @@ export class FxSystem {
       ctx.fillStyle = "#fff6d8";
       ctx.strokeStyle = "#1a1208";
       ctx.lineWidth = 3;
-      ctx.font = "bold 12px Courier New";
-      ctx.strokeText("LOOT!", 2, 14);
-      ctx.fillText("LOOT!", 2, 14);
+      ctx.font = 'bold 9px "Press Start 2P", monospace';
+      ctx.strokeText("LOOT!", 2, 13);
+      ctx.fillText("LOOT!", 2, 13);
     });
 
     paint("ring", 96, 96, (ctx) => {
@@ -104,9 +104,9 @@ export class FxSystem {
       ctx.fillStyle = "#ffd6a0";
       ctx.strokeStyle = "#1a1208";
       ctx.lineWidth = 3;
-      ctx.font = "bold 12px Courier New";
-      ctx.strokeText("SNIFF", 2, 14);
-      ctx.fillText("SNIFF", 2, 14);
+      ctx.font = 'bold 9px "Press Start 2P", monospace';
+      ctx.strokeText("SNIFF", 2, 13);
+      ctx.fillText("SNIFF", 2, 13);
     });
 
     paint("shield", 48, 30, (ctx) => {
@@ -235,13 +235,13 @@ export class FxSystem {
       .setScale(scale);
 
     if (isCrit) {
-      t.setFontSize("22px");
-      t.setStroke("#780000", 6);
+      t.setFontSize("13px");
+      t.setStroke("#780000", 4);
       t.setData("life", 0.75);
       t.setData("vy", -55);
     } else {
-      t.setFontSize("16px");
-      t.setStroke("#140e06", 4);
+      t.setFontSize("10px");
+      t.setStroke("#140e06", 3);
       t.setData("life", 0.55);
       t.setData("vy", -36);
     }

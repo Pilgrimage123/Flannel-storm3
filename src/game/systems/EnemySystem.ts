@@ -1302,8 +1302,8 @@ export class EnemySystem {
       body.setVelocity(body.velocity.x + (kx / len) * push, body.velocity.y + (ky / len) * push);
     }
 
-    enemy.setTint(isCrit ? 0xffcc00 : 0xffffff);
-    this.ctx.delayedCall(80, () => {
+    enemy.setTintFill(isCrit ? 0xffea00 : 0xffffff);
+    this.ctx.delayedCall(65, () => {
       if (enemy.active) {
         if (e.kind === "prigozhin" && e.enraged) {
           enemy.setTint(0xff5533);

@@ -142,7 +142,18 @@ export class WeaponSystem {
     const speed = 640;
 
     // Snappy double-tap or quad-barrage
-    this.ctx.shoot(this.ctx.player.x, this.ctx.player.y, baseAng, speed, baseDmg, pierce, false, "bullet", 0.75, 0);
+    this.ctx.shoot(
+      this.ctx.player.x,
+      this.ctx.player.y,
+      baseAng,
+      speed,
+      baseDmg,
+      pierce,
+      false,
+      "bullet",
+      0.75,
+      0,
+    );
 
     if (level >= 2 || isAmbush) {
       this.ctx.delayedCall(45, () => {
@@ -163,14 +174,58 @@ export class WeaponSystem {
     }
 
     if (level >= 3) {
-      this.ctx.shoot(this.ctx.player.x, this.ctx.player.y, baseAng + 0.18, speed, baseDmg * 0.85, pierce, false, "bullet", 0.75, 0);
-      this.ctx.shoot(this.ctx.player.x, this.ctx.player.y, baseAng - 0.18, speed, baseDmg * 0.85, pierce, false, "bullet", 0.75, 0);
+      this.ctx.shoot(
+        this.ctx.player.x,
+        this.ctx.player.y,
+        baseAng + 0.18,
+        speed,
+        baseDmg * 0.85,
+        pierce,
+        false,
+        "bullet",
+        0.75,
+        0,
+      );
+      this.ctx.shoot(
+        this.ctx.player.x,
+        this.ctx.player.y,
+        baseAng - 0.18,
+        speed,
+        baseDmg * 0.85,
+        pierce,
+        false,
+        "bullet",
+        0.75,
+        0,
+      );
     }
 
     if (level >= 5) {
       // Overclocked Gatling Cannon: hyper fire!
-      this.ctx.shoot(this.ctx.player.x, this.ctx.player.y, baseAng + 0.32, speed, baseDmg * 0.75, pierce, false, "bullet", 0.75, 0);
-      this.ctx.shoot(this.ctx.player.x, this.ctx.player.y, baseAng - 0.32, speed, baseDmg * 0.75, pierce, false, "bullet", 0.75, 0);
+      this.ctx.shoot(
+        this.ctx.player.x,
+        this.ctx.player.y,
+        baseAng + 0.32,
+        speed,
+        baseDmg * 0.75,
+        pierce,
+        false,
+        "bullet",
+        0.75,
+        0,
+      );
+      this.ctx.shoot(
+        this.ctx.player.x,
+        this.ctx.player.y,
+        baseAng - 0.32,
+        speed,
+        baseDmg * 0.75,
+        pierce,
+        false,
+        "bullet",
+        0.75,
+        0,
+      );
     }
 
     if (isAmbush) synth.tracer();

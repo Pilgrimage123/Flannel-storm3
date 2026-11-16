@@ -5,6 +5,7 @@ All notable changes to **Operation: Flannel Storm** are documented in this file.
 ## [Unreleased] - 2026-10-16
 
 ### Gameplay & Grand Finale
+
 - **5-Minute Grand Finale Boss Encounter**:
   - Scheduled the climactic final boss battle against **Big Zombie Prigožin Clone (Warlord)** to spawn at the 5-minute (300s) mark.
   - Accompanied by Wagner shockguard convoy, iconic quotes ("WHERE IS THE AMMUNITION?!"), sledgehammer ground slams, explosive ammo crate projectiles, and an enraged phase below 50% HP.
@@ -19,6 +20,7 @@ All notable changes to **Operation: Flannel Storm** are documented in this file.
   - Integrated smart HUD countdown timers showing `BOSS mm:ss`, `FINALE mm:ss`, or `⚠️ BOSS FIGHT!`.
 
 ### Bug Fixes & Refinements
+
 - **Enemy & Boss Spawning State Desync**:
   - Fixed a critical bug where primitive copies of `timeSurvived`, `stealth`, `dashT`, and `alive` were passed to `EnemySystem`, leaving `timeSurvived` permanently frozen at `0`.
   - Converted `EnemyContext` properties to live getters closed over `GameScene`, restoring enemy wave escalations, attack dog sniffing, stealth immunity, and boss triggers.
@@ -32,6 +34,7 @@ All notable changes to **Operation: Flannel Storm** are documented in this file.
 ## [0.2.0] - 2026-10-16
 
 ### Architecture & Modularity
+
 - **Subsystem Decomposition**: Refactored monolithic `GameScene.ts` (~1,828 lines) into dedicated, cohesive subsystems:
   - `src/game/systems/EnemySystem.ts`: Encapsulates AI behaviors for all 8 enemy types, spawner progression, riot shield mechanics, combat hit registration, and enemy death drops.
   - `src/game/systems/WeaponSystem.ts`: Manages weapon cooldowns, volleys (Bren guns, artillery barrage, drone swarms, motorcycle charge, MLRS rockets), thermobaric flame patches, and ambush attack multipliers.
@@ -40,12 +43,14 @@ All notable changes to **Operation: Flannel Storm** are documented in this file.
   - `src/game/GameScene.ts`: Streamlined into a lean scene orchestrator (~820 lines) coordinating Phaser lifecycle events, input translation, camera tracking, and collision bindings.
 
 ### Performance & Algorithms
+
 - **2D Spatial Hash Grid**: Introduced `src/game/spatial/SpatialGrid.ts` replacing the $O(N^2)$ nested pairwise distance checks with an $O(N)$ bucketed spatial index ($C = 32\text{px}$).
   - Uses symmetrical forward neighbor cell checks `(1, 0), (-1, 1), (0, 1), (1, 1)` and center cell to prevent duplicate checks.
   - Zero per-frame heap allocations using pre-allocated `Int32Array` linked lists (`head` and `next`) and an `activeCells` tracking buffer.
   - Added automated unit tests in `src/game/spatial/SpatialGrid.test.ts` verifying cluster separation and distance invariants.
 
 ### Type Safety & Audio Polish
+
 - **Strongly Typed Event Bus**: Updated `BusMap["select-upgrade"]` in `src/game/eventBus.ts` and `GameApp.tsx` from raw strings to strongly-typed `UpgradeId`.
 - **Audio Lifecycle Management**: Added timer tracking (`timers: number[]`) to `Synth` in `src/game/audio.ts` with `stop()` and `setMuted(m)` to cleanly clear pending Web Audio timeouts when muted or destroyed.
 - **Defensive Persistence**: Hardened `loadSave()`, `recordRun()`, and `writeSave()` in `src/game/save.ts` with finite number sanitization (`sanitizeNum`) and error handling for storage quota / private browsing environments.

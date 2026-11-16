@@ -63,7 +63,7 @@ export class SpatialGrid {
     force = 14,
     focusX?: number,
     focusY?: number,
-    cullRadiusSq = 1200 * 1200
+    cullRadiusSq = 1200 * 1200,
   ) {
     this.rebuild(entities);
     const count = entities.length;
@@ -148,7 +148,7 @@ export class SpatialGrid {
     x: number,
     y: number,
     radius: number,
-    entities: Phaser.Physics.Arcade.Sprite[]
+    entities: Phaser.Physics.Arcade.Sprite[],
   ): Phaser.Physics.Arcade.Sprite[] {
     const minCol = Math.max(0, Math.min(this.cols - 1, ((x - radius) * this.invCellSize) | 0));
     const maxCol = Math.max(0, Math.min(this.cols - 1, ((x + radius) * this.invCellSize) | 0));

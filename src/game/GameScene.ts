@@ -241,23 +241,48 @@ export class GameScene extends Phaser.Scene {
           if (this.combo > this.maxCombo) this.maxCombo = this.combo;
 
           if (this.combo === 10) {
-            this.fxSystem.comic(this.player.x, this.player.y - 75, "🔥 RAMPAGE! (10 KILLS)", "#ff9e00");
+            this.fxSystem.comic(
+              this.player.x,
+              this.player.y - 75,
+              "🔥 RAMPAGE! (10 KILLS)",
+              "#ff9e00",
+            );
             synth.combo(1);
             this.shakeCam(120, 0.007);
           } else if (this.combo === 25) {
-            this.fxSystem.comic(this.player.x, this.player.y - 75, "⚡ UNSTOPPABLE! (25 KILLS)", "#ff0054");
+            this.fxSystem.comic(
+              this.player.x,
+              this.player.y - 75,
+              "⚡ UNSTOPPABLE! (25 KILLS)",
+              "#ff0054",
+            );
             synth.combo(2);
             this.shakeCam(150, 0.009);
           } else if (this.combo === 50) {
-            this.fxSystem.comic(this.player.x, this.player.y - 75, "⭐ HOLY FLANNEL! (50 KILLS)", "#00f5d4");
+            this.fxSystem.comic(
+              this.player.x,
+              this.player.y - 75,
+              "⭐ HOLY FLANNEL! (50 KILLS)",
+              "#00f5d4",
+            );
             synth.combo(3);
             this.shakeCam(180, 0.011);
           } else if (this.combo === 100) {
-            this.fxSystem.comic(this.player.x, this.player.y - 75, "💥 NUCLEAR AMBUSH! (100 KILLS)", "#ffd60a");
+            this.fxSystem.comic(
+              this.player.x,
+              this.player.y - 75,
+              "💥 NUCLEAR AMBUSH! (100 KILLS)",
+              "#ffd60a",
+            );
             synth.combo(4);
             this.shakeCam(220, 0.014);
           } else if (this.combo % 50 === 0 && this.combo > 100) {
-            this.fxSystem.comic(this.player.x, this.player.y - 75, `👑 GODLIKE PAVEL! (${this.combo} KILLS)`, "#ffffff");
+            this.fxSystem.comic(
+              this.player.x,
+              this.player.y - 75,
+              `👑 GODLIKE PAVEL! (${this.combo} KILLS)`,
+              "#ffffff",
+            );
             synth.combo(5);
             this.shakeCam(240, 0.015);
           }
@@ -328,7 +353,8 @@ export class GameScene extends Phaser.Scene {
           this.triggerBeerRage(sec);
         },
         banner: (text, color) => this.fxSystem.banner(this.player.x, this.player.y, text, color),
-        floater: (x, y, text, color, scale, isCrit) => this.fxSystem.floater(x, y, text, color, scale, isCrit),
+        floater: (x, y, text, color, scale, isCrit) =>
+          this.fxSystem.floater(x, y, text, color, scale, isCrit),
         dress: (s, k, h, hit) => this.dress(s, k, h, hit),
         pauseGame: () => {
           this.held.clear();
@@ -371,7 +397,10 @@ export class GameScene extends Phaser.Scene {
     window.addEventListener("blur", this.onWinBlur);
 
     this.physics.add.overlap(this.bullets, this.enemies, (a, b) => {
-      this.enemySystem.onFriendlyHit(a as Phaser.Physics.Arcade.Sprite, b as Phaser.Physics.Arcade.Sprite);
+      this.enemySystem.onFriendlyHit(
+        a as Phaser.Physics.Arcade.Sprite,
+        b as Phaser.Physics.Arcade.Sprite,
+      );
     });
     this.physics.add.overlap(this.hostile, this.player, (a) => {
       const shot = a as Phaser.Physics.Arcade.Sprite;
@@ -502,7 +531,12 @@ export class GameScene extends Phaser.Scene {
       if (this.scene.isPaused()) this.scene.resume();
       this.physics.resume();
       this.enemySystem.startEndlessMode();
-      this.fxSystem.banner(this.player.x, this.player.y, "⚔️ ENDLESS SURVIVAL MODE ENGAGED! ⚔️", "#ffd60a");
+      this.fxSystem.banner(
+        this.player.x,
+        this.player.y,
+        "⚔️ ENDLESS SURVIVAL MODE ENGAGED! ⚔️",
+        "#ffd60a",
+      );
     };
     this.unsubs = [
       bus.on("toggle-stealth", onToggle),
@@ -599,7 +633,7 @@ export class GameScene extends Phaser.Scene {
       const key =
         roll < 0.28
           ? "tree"
-          : roll < 0.50
+          : roll < 0.5
             ? "flowers"
             : roll < 0.68
               ? "dragon_teeth"
@@ -708,7 +742,7 @@ export class GameScene extends Phaser.Scene {
       (this.player.body as Phaser.Physics.Arcade.Body).velocity.x,
       (this.player.body as Phaser.Physics.Arcade.Body).velocity.y,
     );
-    const frameIdx = moving > 8 ? (Math.floor(this.timeSurvived * 9) & 1) : 0;
+    const frameIdx = moving > 8 ? Math.floor(this.timeSurvived * 9) & 1 : 0;
     const baseKey = this.stealth ? "pavel-stealth" : "pavel-loud";
     const key = this.textures.exists(`${baseKey}_${frameIdx}`) ? `${baseKey}_${frameIdx}` : baseKey;
     if (this.player.texture.key !== key) this.dress(this.player, key, 80, 0.34);
@@ -766,7 +800,8 @@ export class GameScene extends Phaser.Scene {
     this.stealth = true;
     this.stacks = 0;
     this.overAcc = 0;
-    const golden = this.lootSystem.level >= 6 || this.weaponSystem.weapons.some((w) => w.level >= 3);
+    const golden =
+      this.lootSystem.level >= 6 || this.weaponSystem.weapons.some((w) => w.level >= 3);
     this.decoy.enableBody(true, this.player.x, this.player.y, true, true);
     this.dress(this.decoy, golden ? "toilet" : "washer", 74, 0.42);
     this.decoy.setActive(true).setVisible(true);
@@ -829,7 +864,12 @@ export class GameScene extends Phaser.Scene {
     }
     if (this.shakeOn) this.cameras.main.shake(300, 0.016 + stacks * 0.003);
     synth.ambush();
-    this.fxSystem.comic(this.player.x, this.player.y - 75, `⚡ ARTICLE 5! x${mul.toFixed(1)} ⚡`, "#ffd60a");
+    this.fxSystem.comic(
+      this.player.x,
+      this.player.y - 75,
+      `⚡ ARTICLE 5! x${mul.toFixed(1)} ⚡`,
+      "#ffd60a",
+    );
   }
 
   private tickStealth(dt: number) {
@@ -854,13 +894,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   dmgMul() {
-    return computeDamageMultipliers(this.ambushT > 0, this.ambushStacks, this.combo, this.beerRage).dmgMul;
+    return computeDamageMultipliers(this.ambushT > 0, this.ambushStacks, this.combo, this.beerRage)
+      .dmgMul;
   }
   rateMul() {
-    return computeDamageMultipliers(this.ambushT > 0, this.ambushStacks, this.combo, this.beerRage).rateMul;
+    return computeDamageMultipliers(this.ambushT > 0, this.ambushStacks, this.combo, this.beerRage)
+      .rateMul;
   }
   areaMul() {
-    return computeDamageMultipliers(this.ambushT > 0, this.ambushStacks, this.combo, this.beerRage).areaMul;
+    return computeDamageMultipliers(this.ambushT > 0, this.ambushStacks, this.combo, this.beerRage)
+      .areaMul;
   }
 
   shoot(
@@ -883,7 +926,16 @@ export class GameScene extends Phaser.Scene {
     s.clearTint();
     s.setAlpha(1);
     s.setTexture(key);
-    const h = key === "moto" ? 54 : key === "drone" ? 36 : key === "rocket" ? 28 : key === "ammocrate" ? 32 : 18;
+    const h =
+      key === "moto"
+        ? 54
+        : key === "drone"
+          ? 36
+          : key === "rocket"
+            ? 28
+            : key === "ammocrate"
+              ? 32
+              : 18;
     this.dress(s, key, h, key === "moto" ? 0.7 : key === "ammocrate" ? 0.75 : 0.55);
     s.setDepth(2500);
     s.setFlipX(false);
@@ -1030,7 +1082,12 @@ export class GameScene extends Phaser.Scene {
     this.alive = false;
     this.held.clear();
     this.spaceWas = false;
-    this.fxSystem.banner(this.player.x, this.player.y, "🏆 OPERATION FLANNEL STORM: VICTORY! 🏆", "#ffd60a");
+    this.fxSystem.banner(
+      this.player.x,
+      this.player.y,
+      "🏆 OPERATION FLANNEL STORM: VICTORY! 🏆",
+      "#ffd60a",
+    );
     synth.victory();
     this.shakeCam(420, 0.025);
 
@@ -1040,7 +1097,12 @@ export class GameScene extends Phaser.Scene {
         const ox = (Math.random() - 0.5) * 320;
         const oy = (Math.random() - 0.5) * 320;
         this.fxSystem.explode(this.player.x + ox, this.player.y + oy, 2.4);
-        this.fxSystem.comic(this.player.x + ox, this.player.y + oy - 45, "⭐ FRONT LIBERATED! ⭐", "#00f5d4");
+        this.fxSystem.comic(
+          this.player.x + ox,
+          this.player.y + oy - 45,
+          "⭐ FRONT LIBERATED! ⭐",
+          "#00f5d4",
+        );
       });
     }
 
@@ -1105,7 +1167,14 @@ declare global {
     };
     __flannel?: {
       grantXp: (n: number) => void;
-      dump: () => { x: number; y: number; hp: number; level: number; kills: number; stealth: boolean };
+      dump: () => {
+        x: number;
+        y: number;
+        hp: number;
+        level: number;
+        kills: number;
+        stealth: boolean;
+      };
     };
   }
 }

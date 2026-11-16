@@ -33,7 +33,12 @@ export class FxSystem {
 
   private paintFx() {
     const textures = this.scene.textures;
-    const paint = (key: string, w: number, h: number, draw: (ctx: CanvasRenderingContext2D) => void) => {
+    const paint = (
+      key: string,
+      w: number,
+      h: number,
+      draw: (ctx: CanvasRenderingContext2D) => void,
+    ) => {
       if (textures.exists(key)) return;
       const c = document.createElement("canvas");
       c.width = w;

@@ -22,7 +22,14 @@ export interface LootContext {
   setRecharge(recharge: number): void;
   triggerBeerRage(seconds: number): void;
   banner(text: string, color: string): void;
-  floater(x: number, y: number, text: string, color: string, scale?: number, isCrit?: boolean): void;
+  floater(
+    x: number,
+    y: number,
+    text: string,
+    color: string,
+    scale?: number,
+    isCrit?: boolean,
+  ): void;
   dress(sprite: Phaser.Physics.Arcade.Sprite, key: string, height: number, hit: number): void;
   pauseGame(): void;
   resumeGame(): void;
@@ -138,7 +145,8 @@ export class LootSystem {
   }
 
   tickGems(dt: number) {
-    const magnet = 95 + (this.ctx.isStealth() && this.ranks.nafo > 0 ? 160 + this.ranks.nafo * 40 : 0);
+    const magnet =
+      95 + (this.ctx.isStealth() && this.ranks.nafo > 0 ? 160 + this.ranks.nafo * 40 : 0);
     const magnetSq = magnet * magnet;
     const kids = this.gems.getChildren() as Phaser.Physics.Arcade.Sprite[];
     const px = this.ctx.player.x;
@@ -287,7 +295,18 @@ export class LootSystem {
       const target = this.ctx.findNearestEnemy(this.dog.x, this.dog.y, false);
       if (target) {
         const ang = Math.atan2(target.y - this.dog.y, target.x - this.dog.x);
-        this.ctx.shoot(this.dog.x, this.dog.y, ang, 260, 8 + this.ranks.nafo * 4, 1, false, "brick", 1.2, 0);
+        this.ctx.shoot(
+          this.dog.x,
+          this.dog.y,
+          ang,
+          260,
+          8 + this.ranks.nafo * 4,
+          1,
+          false,
+          "brick",
+          1.2,
+          0,
+        );
       }
     }
   }

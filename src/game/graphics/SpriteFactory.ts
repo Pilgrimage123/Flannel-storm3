@@ -17,19 +17,31 @@ function getSourceImage(
   key: string,
 ): HTMLImageElement | HTMLCanvasElement | null {
   if (!textures.exists(key)) return null;
-  const src = textures.get(key).getSourceImage() as HTMLImageElement | HTMLCanvasElement | undefined;
+  const src = textures.get(key).getSourceImage() as
+    HTMLImageElement | HTMLCanvasElement | undefined;
   if (!src || !("width" in src) || src.width === 0) return null;
   return src;
 }
 
-function registerCanvas(textures: Phaser.Textures.TextureManager, key: string, canvas: HTMLCanvasElement) {
+function registerCanvas(
+  textures: Phaser.Textures.TextureManager,
+  key: string,
+  canvas: HTMLCanvasElement,
+) {
   if (textures.exists(key)) {
     textures.remove(key);
   }
   textures.addCanvas(key, canvas);
 }
 
-function roundRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+function roundRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
   const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + rr, y);
@@ -87,7 +99,13 @@ function fillStrokeEllipse(
   }
 }
 
-function drawStGeorgeRibbon(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+function drawStGeorgeRibbon(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
   ctx.save();
   ctx.fillStyle = "#ff7300";
   ctx.fillRect(x, y, w, h);
@@ -102,7 +120,14 @@ function drawStGeorgeRibbon(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.restore();
 }
 
-function drawSloppyZ(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, color = "#ffffff", lw = 3) {
+function drawSloppyZ(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  color = "#ffffff",
+  lw = 3,
+) {
   ctx.save();
   ctx.strokeStyle = INK;
   ctx.lineWidth = lw + 2.2;
@@ -119,7 +144,13 @@ function drawSloppyZ(ctx: CanvasRenderingContext2D, cx: number, cy: number, size
   ctx.restore();
 }
 
-function drawTelnyashkaPatch(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+function drawTelnyashkaPatch(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
   ctx.save();
   roundRectPath(ctx, x, y, w, h, 3);
   ctx.clip();
@@ -139,7 +170,9 @@ function drawTelnyashkaPatch(ctx: CanvasRenderingContext2D, x: number, y: number
 /**
  * 1. Enhanced Organic Steppe Battlefield Terrain (`ground`)
  */
-function buildGroundTexture(baseImg: HTMLImageElement | HTMLCanvasElement | null): HTMLCanvasElement {
+function buildGroundTexture(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+): HTMLCanvasElement {
   const S = 512;
   const [c, ctx] = makeCanvas(S, S);
 
@@ -202,7 +235,10 @@ function buildGroundTexture(baseImg: HTMLImageElement | HTMLCanvasElement | null
 /**
  * 2. Mobik Conscript (`conscript`, `conscript_0`, `conscript_1`)
  */
-function buildConscriptFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildConscriptFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 112;
   const H = 136;
   const [c, ctx] = makeCanvas(W, H);
@@ -270,7 +306,10 @@ function buildConscriptFrame(baseImg: HTMLImageElement | HTMLCanvasElement | nul
 /**
  * 3. Kadyrovite "Akhmat" TikTok Battalion Streamer (`tiktok`, `tiktok_0`, `tiktok_1`)
  */
-function buildTikTokFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildTikTokFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 116;
   const H = 140;
   const [c, ctx] = makeCanvas(W, H);
@@ -360,7 +399,10 @@ function buildTikTokFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, 
  * Xiaomi/Ninebot-style electric kick-scooter with glowing neon-blue battery LEDs,
  * a front shopping basket with stolen loot, and an RPG-7 strapped to the stem with Blue Isolenta!
  */
-function buildScooterFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildScooterFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 124;
   const H = 148;
   const [c, ctx] = makeCanvas(W, H);
@@ -455,7 +497,10 @@ function buildScooterFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null,
 /**
  * 4. Chinese Desertcross-1000-3 Assault Golf Cart (`cart`, `cart_0`, `cart_1`)
  */
-function buildGolfCartFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildGolfCartFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 156;
   const H = 144;
   const [c, ctx] = makeCanvas(W, H);
@@ -735,7 +780,10 @@ function buildMtlbFrame(frame: 0 | 1): HTMLCanvasElement {
 /**
  * 5. Tsar-Mangal / Blyatmobile Barn-Armored Turtle Tank (`turtle`, `turtle_0`, `turtle_1`)
  */
-function buildTurtleTankFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildTurtleTankFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 156;
   const H = 154;
   const [c, ctx] = makeCanvas(W, H);
@@ -797,7 +845,10 @@ function buildTurtleTankFrame(baseImg: HTMLImageElement | HTMLCanvasElement | nu
 /**
  * 6. Storm-Z / OMON Riot Shield Trooper (`riot`, `riot_0`, `riot_1`)
  */
-function buildRiotTrooperFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildRiotTrooperFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 96;
   const H = 168;
   const [c, ctx] = makeCanvas(W, H);
@@ -851,7 +902,10 @@ function buildDirectionalShieldArcTexture(): HTMLCanvasElement {
 /**
  * 7. Geran-2 / Lancet Kamikaze Drone (`kamikaze`, `kamikaze_0`, `kamikaze_1`)
  */
-function buildKamikazeDroneFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildKamikazeDroneFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 136;
   const H = 108;
   const [c, ctx] = makeCanvas(W, H);
@@ -896,7 +950,10 @@ function buildKamikazeDroneFrame(baseImg: HTMLImageElement | HTMLCanvasElement |
 /**
  * 8. Conscript K9 Recon Hound (`k9`, `k9_0`, `k9_1`)
  */
-function buildK9Frame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildK9Frame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 112;
   const H = 138;
   const [c, ctx] = makeCanvas(W, H);
@@ -936,7 +993,10 @@ function buildK9Frame(baseImg: HTMLImageElement | HTMLCanvasElement | null, fram
 /**
  * 9. Inflatable S-400 Triumph Decoy Boss (`boss`, `boss_0`, `boss_1`)
  */
-function buildInflatableBossFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildInflatableBossFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 188;
   const H = 196;
   const [c, ctx] = makeCanvas(W, H);
@@ -981,7 +1041,10 @@ function buildInflatableBossFrame(baseImg: HTMLImageElement | HTMLCanvasElement 
 /**
  * 10. Big Zombie Prigožin Clone (`prigozhin`, `prigozhin_0`, `prigozhin_1`)
  */
-function buildPrigozhinFrame(baseImg: HTMLImageElement | HTMLCanvasElement | null, frame: 0 | 1): HTMLCanvasElement {
+function buildPrigozhinFrame(
+  baseImg: HTMLImageElement | HTMLCanvasElement | null,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = 188;
   const H = 216;
   const [c, ctx] = makeCanvas(W, H);
@@ -1011,7 +1074,11 @@ function buildPrigozhinFrame(baseImg: HTMLImageElement | HTMLCanvasElement | nul
  * Composites torn/collapsed anti-drone Cope Cages, blackened shell craters,
  * splintered armor, hissing Blue Isolenta patches, and 2-frame flickering open flames!
  */
-function buildDamagedVariant(healthyCanvas: HTMLCanvasElement, baseKey: string, frame: 0 | 1): HTMLCanvasElement {
+function buildDamagedVariant(
+  healthyCanvas: HTMLCanvasElement,
+  baseKey: string,
+  frame: 0 | 1,
+): HTMLCanvasElement {
   const W = healthyCanvas.width;
   const H = healthyCanvas.height;
   const [c, ctx] = makeCanvas(W, H);
@@ -1085,7 +1152,16 @@ function buildDamagedVariant(healthyCanvas: HTMLCanvasElement, baseKey: string, 
     ctx.stroke();
   } else {
     // Riot / Prigozhin damaged sparks & fire
-    fillStrokeEllipse(ctx, cx, cy - 12, frame === 0 ? 8 : 11, frame === 0 ? 12 : 16, "#ff5400", INK, 1.8);
+    fillStrokeEllipse(
+      ctx,
+      cx,
+      cy - 12,
+      frame === 0 ? 8 : 11,
+      frame === 0 ? 12 : 16,
+      "#ff5400",
+      INK,
+      1.8,
+    );
     fillStrokeEllipse(ctx, cx, cy - 10, 4, 7, "#ffd60a", INK, 1.2);
   }
 
@@ -1171,7 +1247,12 @@ export function installUpgradedGraphics(scene: Phaser.Scene) {
 
   registerCanvas(tex, "ground", buildGroundTexture(srcGround));
 
-  const registerPair = (baseKey: string, f0: HTMLCanvasElement, f1: HTMLCanvasElement, withDamage = false) => {
+  const registerPair = (
+    baseKey: string,
+    f0: HTMLCanvasElement,
+    f1: HTMLCanvasElement,
+    withDamage = false,
+  ) => {
     registerCanvas(tex, baseKey, f0);
     registerCanvas(tex, `${baseKey}_0`, f0);
     registerCanvas(tex, `${baseKey}_1`, f1);
@@ -1181,20 +1262,55 @@ export function installUpgradedGraphics(scene: Phaser.Scene) {
     }
   };
 
-  registerPair("conscript", buildConscriptFrame(srcConscript, 0), buildConscriptFrame(srcConscript, 1), false);
+  registerPair(
+    "conscript",
+    buildConscriptFrame(srcConscript, 0),
+    buildConscriptFrame(srcConscript, 1),
+    false,
+  );
   registerPair("tiktok", buildTikTokFrame(srcTikTok, 0), buildTikTokFrame(srcTikTok, 1), false);
-  registerPair("scooter", buildScooterFrame(srcConscript, 0), buildScooterFrame(srcConscript, 1), false);
+  registerPair(
+    "scooter",
+    buildScooterFrame(srcConscript, 0),
+    buildScooterFrame(srcConscript, 1),
+    false,
+  );
   registerPair("cart", buildGolfCartFrame(srcCart, 0), buildGolfCartFrame(srcCart, 1), true);
   registerPair("bukhanka", buildBukhankaFrame(0), buildBukhankaFrame(1), true);
   registerPair("mtlb", buildMtlbFrame(0), buildMtlbFrame(1), true);
-  registerPair("turtle", buildTurtleTankFrame(srcTurtle, 0), buildTurtleTankFrame(srcTurtle, 1), true);
+  registerPair(
+    "turtle",
+    buildTurtleTankFrame(srcTurtle, 0),
+    buildTurtleTankFrame(srcTurtle, 1),
+    true,
+  );
   registerPair("riot", buildRiotTrooperFrame(srcRiot, 0), buildRiotTrooperFrame(srcRiot, 1), true);
-  registerPair("kamikaze", buildKamikazeDroneFrame(srcKamikaze, 0), buildKamikazeDroneFrame(srcKamikaze, 1), false);
+  registerPair(
+    "kamikaze",
+    buildKamikazeDroneFrame(srcKamikaze, 0),
+    buildKamikazeDroneFrame(srcKamikaze, 1),
+    false,
+  );
   registerPair("k9", buildK9Frame(srcK9, 0), buildK9Frame(srcK9, 1), false);
-  registerPair("boss", buildInflatableBossFrame(srcBoss, 0), buildInflatableBossFrame(srcBoss, 1), true);
-  registerPair("prigozhin", buildPrigozhinFrame(srcPrigozhin, 0), buildPrigozhinFrame(srcPrigozhin, 1), true);
+  registerPair(
+    "boss",
+    buildInflatableBossFrame(srcBoss, 0),
+    buildInflatableBossFrame(srcBoss, 1),
+    true,
+  );
+  registerPair(
+    "prigozhin",
+    buildPrigozhinFrame(srcPrigozhin, 0),
+    buildPrigozhinFrame(srcPrigozhin, 1),
+    true,
+  );
 
-  registerPair("pavel-loud", buildHeroFrame(srcPavelLoud, 0, true), buildHeroFrame(srcPavelLoud, 1, true), false);
+  registerPair(
+    "pavel-loud",
+    buildHeroFrame(srcPavelLoud, 0, true),
+    buildHeroFrame(srcPavelLoud, 1, true),
+    false,
+  );
   registerPair(
     "pavel-stealth",
     buildHeroFrame(srcPavelStealth, 0, false),

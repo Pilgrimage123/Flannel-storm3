@@ -748,8 +748,12 @@
 }
 
 @keyframes pulse-danger {
-  from { opacity: 0.35; }
-  to { opacity: 0.95; }
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.95;
+  }
 }
 
 .vignette-stealth {
@@ -763,8 +767,12 @@
 }
 
 @keyframes pulse-stealth {
-  from { opacity: 0.45; }
-  to { opacity: 0.9; }
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0.9;
+  }
 }
 
 .vignette-rage {
@@ -778,8 +786,12 @@
 }
 
 @keyframes pulse-rage {
-  from { opacity: 0.55; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .combo-badge {
@@ -793,13 +805,21 @@
 
 .combo-badge.high {
   border-color: #ff0054 !important;
-  box-shadow: 0 0 18px rgba(255, 0, 84, 0.7), inset 0 0 8px rgba(255, 214, 10, 0.4) !important;
+  box-shadow:
+    0 0 18px rgba(255, 0, 84, 0.7),
+    inset 0 0 8px rgba(255, 214, 10, 0.4) !important;
   animation: pulse-high-combo 0.5s ease-in-out infinite alternate;
 }
 
 @keyframes pulse-high-combo {
-  from { transform: scale(1); filter: brightness(1); }
-  to { transform: scale(1.04); filter: brightness(1.25); }
+  from {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  to {
+    transform: scale(1.04);
+    filter: brightness(1.25);
+  }
 }
 
 .combo-fire {
@@ -809,8 +829,12 @@
 }
 
 @keyframes flame-wiggle {
-  from { transform: rotate(-8deg) scale(0.9); }
-  to { transform: rotate(8deg) scale(1.2); }
+  from {
+    transform: rotate(-8deg) scale(0.9);
+  }
+  to {
+    transform: rotate(8deg) scale(1.2);
+  }
 }
 
 .combo-tag {
@@ -837,18 +861,28 @@
 }
 
 @keyframes pulse-art5 {
-  from { filter: brightness(1); }
-  to { filter: brightness(1.35); }
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.35);
+  }
 }
 
 .flannel.ready {
-  box-shadow: 0 0 18px 4px rgba(255, 214, 10, 0.65), 0 0 0 3px #ffd60a !important;
+  box-shadow:
+    0 0 18px 4px rgba(255, 214, 10, 0.65),
+    0 0 0 3px #ffd60a !important;
   animation: ready-pulse 0.9s ease-in-out infinite alternate;
 }
 
 @keyframes ready-pulse {
-  from { transform: scale(1); }
-  to { transform: scale(1.05); }
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
 }
 
 .choice-header {
@@ -879,7 +913,9 @@
 
 .rarity-elite {
   border-color: #ff9e00 !important;
-  box-shadow: 0 0 10px rgba(255, 158, 0, 0.35), inset 0 0 8px rgba(255, 183, 3, 0.2);
+  box-shadow:
+    0 0 10px rgba(255, 158, 0, 0.35),
+    inset 0 0 8px rgba(255, 183, 3, 0.2);
 }
 .rarity-elite .choice-rarity {
   background: #382005;
@@ -889,7 +925,9 @@
 
 .rarity-legendary {
   border-color: #00f5d4 !important;
-  box-shadow: 0 0 16px rgba(0, 245, 212, 0.5), inset 0 0 12px rgba(255, 0, 84, 0.25);
+  box-shadow:
+    0 0 16px rgba(0, 245, 212, 0.5),
+    inset 0 0 12px rgba(255, 0, 84, 0.25);
   animation: legendary-glow 1.4s ease-in-out infinite alternate;
 }
 .rarity-legendary .choice-rarity {
@@ -900,9 +938,18 @@
 }
 
 @keyframes legendary-glow {
-  0% { border-color: #00f5d4; box-shadow: 0 0 14px rgba(0, 245, 212, 0.5); }
-  50% { border-color: #ffd60a; box-shadow: 0 0 18px rgba(255, 214, 10, 0.65); }
-  100% { border-color: #ff0054; box-shadow: 0 0 14px rgba(255, 0, 84, 0.5); }
+  0% {
+    border-color: #00f5d4;
+    box-shadow: 0 0 14px rgba(0, 245, 212, 0.5);
+  }
+  50% {
+    border-color: #ffd60a;
+    box-shadow: 0 0 18px rgba(255, 214, 10, 0.65);
+  }
+  100% {
+    border-color: #ff0054;
+    box-shadow: 0 0 14px rgba(255, 0, 84, 0.5);
+  }
 }
 
 .modal-footer {
@@ -920,7 +967,9 @@
   padding: 8px 16px;
   cursor: pointer;
   box-shadow: 0 0 8px rgba(255, 158, 0, 0.35);
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
 }
 
 .reroll-btn:hover:not(:disabled) {
@@ -1150,4 +1199,3 @@
     height: 10px;
   }
 }
-

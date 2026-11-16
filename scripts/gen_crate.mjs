@@ -81,7 +81,12 @@ for (let x = 2; x < W - 2; x++) {
   pixels[Math.floor(H / 2)][x] = [35, 42, 25, 255];
 }
 // Metal brackets in corners
-const corners = [[2, 2], [W - 8, 2], [2, H - 8], [W - 8, H - 8]];
+const corners = [
+  [2, 2],
+  [W - 8, 2],
+  [2, H - 8],
+  [W - 8, H - 8],
+];
 for (const [cx, cy] of corners) {
   for (let dy = 0; dy < 6; dy++) {
     for (let dx = 0; dx < 6; dx++) {

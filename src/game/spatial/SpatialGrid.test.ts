@@ -1,6 +1,6 @@
-import { describe, it } from "node:test";
+import { describe, it } from "vitest";
 import assert from "node:assert";
-import { SpatialGrid } from "./SpatialGrid.ts";
+import { SpatialGrid } from "./SpatialGrid";
 
 describe("SpatialGrid performance and separation", () => {
   it("initializes without errors and clears correctly", () => {
@@ -33,7 +33,7 @@ describe("SpatialGrid performance and separation", () => {
 
     // Verify separation applied repulsive velocities
     const moved = mockEntities.some(
-      (e) => Math.abs(e.body.velocity.x) > 0 || Math.abs(e.body.velocity.y) > 0
+      (e) => Math.abs(e.body.velocity.x) > 0 || Math.abs(e.body.velocity.y) > 0,
     );
     assert.strictEqual(moved, true, "Separation forces should push clustered entities apart");
   });
@@ -52,7 +52,11 @@ describe("SpatialGrid performance and separation", () => {
 
     const inside = grid.queryRadius(100, 100, 50, mockEntities);
     assert.strictEqual(inside.length, 2, "Radius query should find only nearby entities");
-    assert.strictEqual(inside.includes(mockEntities[2]), false, "Distant entity should be excluded");
+    assert.strictEqual(
+      inside.includes(mockEntities[2]),
+      false,
+      "Distant entity should be excluded",
+    );
   });
 
   it("indexes a single entity during resolveSeparation and handles rebuild after swap-and-pop", () => {

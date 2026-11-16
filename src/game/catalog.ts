@@ -82,7 +82,8 @@ export function offerFor(id: UpgradeId, rank: number): UpgradeOffer {
   if (weapon) {
     const isMax = rank === WEAPON_MAX;
     const rarity = isMax ? "legendary" : rank >= 3 ? "elite" : "tactical";
-    const blurb = rank === 1 ? "★ NEW ARSENAL" : isMax ? "⚡ OVERCLOCKED MAX" : `RANK ${rank} UPGRADE`;
+    const blurb =
+      rank === 1 ? "★ NEW ARSENAL" : isMax ? "⚡ OVERCLOCKED MAX" : `RANK ${rank} UPGRADE`;
     const detail =
       rank === 1
         ? weapon.loud

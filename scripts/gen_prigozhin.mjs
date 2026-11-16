@@ -132,5 +132,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width
 </svg>`;
 
 fs.writeFileSync("/tmp/prigozhin.svg", svg);
-execSync("convert -background none /tmp/prigozhin.svg -resize 200x240 public/sprites/prigozhin.png");
+execSync(
+  "convert -background none /tmp/prigozhin.svg -resize 200x240 public/sprites/prigozhin.png",
+);
 console.log("Generated public/sprites/prigozhin.png successfully!");

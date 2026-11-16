@@ -1,4 +1,4 @@
-import { describe, it } from "node:test";
+import { describe, it } from "vitest";
 import assert from "node:assert/strict";
 import {
   areAllUpgradesMaxed,
@@ -11,7 +11,11 @@ import {
   rollUpgradeOffers,
 } from "./rules";
 import { PASSIVE_MAX_RANK, PASSIVES, WEAPON_MAX_RANK, WEAPONS } from "./catalog";
-import { ENEMY_VISUAL_SPECS, getEnemyAnimFrame, getEnemyTextureKey } from "./graphics/parodyPalettes";
+import {
+  ENEMY_VISUAL_SPECS,
+  getEnemyAnimFrame,
+  getEnemyTextureKey,
+} from "./graphics/parodyPalettes";
 
 describe("game rules", () => {
   it("computes consistent XP curve, wave, and pressure", () => {
@@ -63,7 +67,11 @@ describe("game rules", () => {
   });
 
   it("rolls up to 3 unmaxed upgrade offers and falls back to Field Rations when maxed", () => {
-    const offers = rollUpgradeOffers({ bren: 1 }, { lumberjack: 0, pilsner: 0, nafo: 0 }, () => 0.5);
+    const offers = rollUpgradeOffers(
+      { bren: 1 },
+      { lumberjack: 0, pilsner: 0, nafo: 0 },
+      () => 0.5,
+    );
     assert.equal(offers.length, 3);
     assert.equal(areAllUpgradesMaxed({ bren: 1 }, { lumberjack: 0, pilsner: 0, nafo: 0 }), false);
 

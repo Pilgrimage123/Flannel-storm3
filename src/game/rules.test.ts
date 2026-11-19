@@ -103,10 +103,12 @@ describe("game rules", () => {
     assert.equal(getEnemyAnimFrame("turtle", 0, 0), 0);
     assert.equal(getEnemyAnimFrame("turtle", 0.1, 0), 1);
 
-    // Healthy vs <50% HP Battle-Damaged texture key switching
-    assert.equal(getEnemyTextureKey("bukhanka", "bukhanka", 80, 100, 0, 0), "bukhanka_0");
-    assert.equal(getEnemyTextureKey("bukhanka", "bukhanka", 49, 100, 0, 0), "bukhanka_dmg_0");
-    assert.equal(getEnemyTextureKey("bukhanka", "bukhanka", 49, 100, 0.1, 0), "bukhanka_dmg_1");
-    assert.equal(getEnemyTextureKey("scooter", "scooter", 20, 100, 0, 0), "scooter_0");
+    // Healthy vs <50% HP Battle-Damaged directional texture key switching
+    assert.equal(getEnemyTextureKey("bukhanka", "bukhanka", 80, 100, 0, 0, 1), "bukhanka_r_0");
+    assert.equal(getEnemyTextureKey("bukhanka", "bukhanka", 80, 100, 0, 0, -1), "bukhanka_l_0");
+    assert.equal(getEnemyTextureKey("bukhanka", "bukhanka", 49, 100, 0, 0, 1), "bukhanka_dmg_r_0");
+    assert.equal(getEnemyTextureKey("bukhanka", "bukhanka", 49, 100, 0.1, 0, -1), "bukhanka_dmg_l_1");
+    assert.equal(getEnemyTextureKey("scooter", "scooter", 20, 100, 0, 0, -1), "scooter_l_0");
+    assert.equal(getEnemyTextureKey("boss", "boss", 40, 100, 0, 0, 1), "boss_dmg_l_0");
   });
 });

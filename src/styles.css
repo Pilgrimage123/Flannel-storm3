@@ -276,6 +276,7 @@
   margin-top: 6px;
   color: var(--color-gold);
   font-size: 14px;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat span,
@@ -370,6 +371,56 @@
   color: var(--color-foam);
 }
 
+.roster-heading {
+  margin-top: 16px !important;
+}
+
+.roster-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.roster-thumb {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a2417;
+  border: 2px solid var(--color-amber);
+  overflow: hidden;
+}
+
+.roster-thumb img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.roster-insignia-glyph {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  line-height: 1.25;
+  text-align: center;
+  padding: 2px;
+}
+
+.roster-card h3 {
+  margin: 0 0 4px;
+}
+
+.roster-meta {
+  display: block;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--color-mute);
+  letter-spacing: 0.04em;
+}
+
 .back {
   margin-top: 12px;
   border: 2px solid var(--color-amber);
@@ -422,6 +473,7 @@
   width: 42px;
   height: 42px;
   object-fit: cover;
+  image-rendering: pixelated;
   background: #24301c;
   border: 2px solid #0b0e09;
 }
@@ -501,6 +553,7 @@
 .hud-card b {
   color: var(--color-foam);
   font-size: 11px;
+  font-variant-numeric: tabular-nums;
 }
 
 .hud-actions {
@@ -581,16 +634,61 @@
 .flannel img {
   position: absolute;
   top: 12px;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   object-fit: cover;
+  image-rendering: pixelated;
   border-radius: 50%;
   border: 2px solid #1a0a0c;
+  background: #24301c;
+}
+
+.flannel-label {
+  display: block;
+  text-shadow: 1px 1px 0 #090c07;
+}
+
+.flannel-key {
+  display: none;
+  margin-top: 3px;
+  padding: 2px 5px;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--color-gold);
+  background: rgb(10 16 10 / 0.9);
+  border: 1px solid #d7a21a;
 }
 
 .flannel.on {
   box-shadow: 0 0 0 3px var(--color-gold);
   filter: saturate(1.2);
+}
+
+/* Desktop pointer devices: hide touch joystick, keep compact corner Flannel button */
+@media (hover: hover) and (pointer: fine) {
+  .stick-zone {
+    display: none;
+  }
+
+  .flannel {
+    width: 114px;
+    height: 114px;
+    right: 18px;
+    bottom: 18px;
+    border-width: 5px;
+    padding: 0 8px 15px;
+    font-size: 7px;
+  }
+
+  .flannel img {
+    top: 8px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .flannel-key {
+    display: inline-block;
+  }
 }
 
 .modal {
@@ -748,12 +846,8 @@
 }
 
 @keyframes pulse-danger {
-  from {
-    opacity: 0.35;
-  }
-  to {
-    opacity: 0.95;
-  }
+  from { opacity: 0.35; }
+  to { opacity: 0.95; }
 }
 
 .vignette-stealth {
@@ -767,12 +861,8 @@
 }
 
 @keyframes pulse-stealth {
-  from {
-    opacity: 0.45;
-  }
-  to {
-    opacity: 0.9;
-  }
+  from { opacity: 0.45; }
+  to { opacity: 0.9; }
 }
 
 .vignette-rage {
@@ -786,12 +876,8 @@
 }
 
 @keyframes pulse-rage {
-  from {
-    opacity: 0.55;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0.55; }
+  to { opacity: 1; }
 }
 
 .combo-badge {
@@ -805,21 +891,13 @@
 
 .combo-badge.high {
   border-color: #ff0054 !important;
-  box-shadow:
-    0 0 18px rgba(255, 0, 84, 0.7),
-    inset 0 0 8px rgba(255, 214, 10, 0.4) !important;
+  box-shadow: 0 0 18px rgba(255, 0, 84, 0.7), inset 0 0 8px rgba(255, 214, 10, 0.4) !important;
   animation: pulse-high-combo 0.5s ease-in-out infinite alternate;
 }
 
 @keyframes pulse-high-combo {
-  from {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  to {
-    transform: scale(1.04);
-    filter: brightness(1.25);
-  }
+  from { transform: scale(1); filter: brightness(1); }
+  to { transform: scale(1.04); filter: brightness(1.25); }
 }
 
 .combo-fire {
@@ -829,12 +907,8 @@
 }
 
 @keyframes flame-wiggle {
-  from {
-    transform: rotate(-8deg) scale(0.9);
-  }
-  to {
-    transform: rotate(8deg) scale(1.2);
-  }
+  from { transform: rotate(-8deg) scale(0.9); }
+  to { transform: rotate(8deg) scale(1.2); }
 }
 
 .combo-tag {
@@ -861,28 +935,18 @@
 }
 
 @keyframes pulse-art5 {
-  from {
-    filter: brightness(1);
-  }
-  to {
-    filter: brightness(1.35);
-  }
+  from { filter: brightness(1); }
+  to { filter: brightness(1.35); }
 }
 
 .flannel.ready {
-  box-shadow:
-    0 0 18px 4px rgba(255, 214, 10, 0.65),
-    0 0 0 3px #ffd60a !important;
+  box-shadow: 0 0 18px 4px rgba(255, 214, 10, 0.65), 0 0 0 3px #ffd60a !important;
   animation: ready-pulse 0.9s ease-in-out infinite alternate;
 }
 
 @keyframes ready-pulse {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(1.05);
-  }
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
 }
 
 .choice-header {
@@ -913,9 +977,7 @@
 
 .rarity-elite {
   border-color: #ff9e00 !important;
-  box-shadow:
-    0 0 10px rgba(255, 158, 0, 0.35),
-    inset 0 0 8px rgba(255, 183, 3, 0.2);
+  box-shadow: 0 0 10px rgba(255, 158, 0, 0.35), inset 0 0 8px rgba(255, 183, 3, 0.2);
 }
 .rarity-elite .choice-rarity {
   background: #382005;
@@ -925,9 +987,7 @@
 
 .rarity-legendary {
   border-color: #00f5d4 !important;
-  box-shadow:
-    0 0 16px rgba(0, 245, 212, 0.5),
-    inset 0 0 12px rgba(255, 0, 84, 0.25);
+  box-shadow: 0 0 16px rgba(0, 245, 212, 0.5), inset 0 0 12px rgba(255, 0, 84, 0.25);
   animation: legendary-glow 1.4s ease-in-out infinite alternate;
 }
 .rarity-legendary .choice-rarity {
@@ -938,18 +998,9 @@
 }
 
 @keyframes legendary-glow {
-  0% {
-    border-color: #00f5d4;
-    box-shadow: 0 0 14px rgba(0, 245, 212, 0.5);
-  }
-  50% {
-    border-color: #ffd60a;
-    box-shadow: 0 0 18px rgba(255, 214, 10, 0.65);
-  }
-  100% {
-    border-color: #ff0054;
-    box-shadow: 0 0 14px rgba(255, 0, 84, 0.5);
-  }
+  0% { border-color: #00f5d4; box-shadow: 0 0 14px rgba(0, 245, 212, 0.5); }
+  50% { border-color: #ffd60a; box-shadow: 0 0 18px rgba(255, 214, 10, 0.65); }
+  100% { border-color: #ff0054; box-shadow: 0 0 14px rgba(255, 0, 84, 0.5); }
 }
 
 .modal-footer {
@@ -967,9 +1018,7 @@
   padding: 8px 16px;
   cursor: pointer;
   box-shadow: 0 0 8px rgba(255, 158, 0, 0.35);
-  transition:
-    transform 0.1s,
-    box-shadow 0.1s;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .reroll-btn:hover:not(:disabled) {
@@ -1169,6 +1218,7 @@
 .boss-title b {
   color: #ffffff;
   font-size: 9px;
+  font-variant-numeric: tabular-nums;
 }
 
 .boss-track {
@@ -1199,3 +1249,49 @@
     height: 10px;
   }
 }
+
+.tactical-banner {
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(92vw, 680px);
+  padding: 7px 14px;
+  background: rgb(10 16 10 / 0.92);
+  border: 2px solid var(--color-gold);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.55);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: center;
+  text-shadow: 2px 2px 0 #090c07;
+  animation: banner-pop 0.16s ease-out;
+}
+
+.banner-tick {
+  display: inline-block;
+  width: 4px;
+  height: 12px;
+  flex: none;
+}
+
+@keyframes banner-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 680px), (max-height: 500px) {
+  .tactical-banner {
+    font-size: 8px;
+    padding: 5px 10px;
+    gap: 7px;
+  }
+}
+
+

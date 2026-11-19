@@ -1,14 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  BookOpen,
-  Crosshair,
-  Maximize,
-  Pause,
-  Play,
-  Settings,
-  Volume2,
-  VolumeX,
-} from "lucide-react";
+import { BookOpen, Crosshair, Maximize, Pause, Play, Settings, Volume2, VolumeX } from "lucide-react";
 import { PASSIVES, WEAPONS } from "@/game/catalog";
 import { bus } from "@/game/eventBus";
 import { ENEMY_VISUAL_SPECS } from "@/game/graphics/parodyPalettes";
@@ -40,11 +31,14 @@ export function GameApp() {
   const [over, setOver] = useState<RunResult | null>(null);
   const [paused, setPaused] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [banner, setBanner] = useState<{ text: string; color: string; id: number } | null>(null);
   const [portrait, setPortrait] = useState(false);
   const [portraitDismissed, setPortraitDismissed] = useState(false);
   const [quitJoke, setQuitJoke] = useState(false);
 
   const toastTimerRef = useRef<number | null>(null);
+  const bannerTimerRef = useRef<number | null>(null);
+  const bannerSeqRef = useRef(0);
   const autoStartedRef = useRef(false);
 
   const showToast = useCallback((message: string, duration = 2200) => {
@@ -84,7 +78,24 @@ export function GameApp() {
       setOver(result);
       setOffers(null);
       setPaused(false);
+      setBanner(null);
       setSave(recordRun(result));
+    });
+    const offBanner = bus.on("tactical-banner", (payload) => {
+      if (bannerTimerRef.current !== null) {
+        window.clearTimeout(bannerTimerRef.current);
+        bannerTimerRef.current = null;
+      }
+      if (!payload) {
+        setBanner(null);
+        return;
+      }
+      bannerSeqRef.current += 1;
+      setBanner({ text: payload.text, color: payload.color, id: bannerSeqRef.current });
+      bannerTimerRef.current = window.setTimeout(() => {
+        setBanner(null);
+        bannerTimerRef.current = null;
+      }, 2200);
     });
     let dead = false;
     let game: { destroy: (removeCanvas: boolean) => void } | null = null;
@@ -102,11 +113,15 @@ export function GameApp() {
       if (toastTimerRef.current !== null) {
         window.clearTimeout(toastTimerRef.current);
       }
+      if (bannerTimerRef.current !== null) {
+        window.clearTimeout(bannerTimerRef.current);
+      }
       offReady();
       offStats();
       offLevel();
       offClear();
       offOver();
+      offBanner();
       game?.destroy(true);
       window.removeEventListener("pointerdown", unlock);
       window.removeEventListener("resize", check);
@@ -232,6 +247,7 @@ export function GameApp() {
     setOver(null);
     setOffers(null);
     setPaused(false);
+    setBanner(null);
     bus.emit("quit", null);
   }
 
@@ -259,6 +275,7 @@ export function GameApp() {
           offers={offers}
           over={over}
           paused={paused}
+          banner={banner}
           onMute={toggleMute}
           onPause={() => {
             setPaused(true);
@@ -405,20 +422,13 @@ function Menu({
       {panel === "arsenal" ? <Arsenal onClose={() => onPanel("none")} /> : null}
       {panel === "manual" ? <Manual onClose={() => onPanel("none")} /> : null}
       {panel === "settings" ? (
-        <SettingsSheet
-          save={save}
-          onMute={onMute}
-          onShake={onShake}
-          onClose={() => onPanel("none")}
-        />
+        <SettingsSheet save={save} onMute={onMute} onShake={onShake} onClose={() => onPanel("none")} />
       ) : null}
       {quitJoke ? (
         <div className="sheet">
           <div className="sheet-card">
             <h2>RETIREMENT DENIED</h2>
-            <p className="note">
-              The washing machine is already spinning. Generals do not quit. They go flannel.
-            </p>
+            <p className="note">The washing machine is already spinning. Generals do not quit. They go flannel.</p>
             <button className="back" onClick={() => onQuitJoke(false)}>
               BACK TO BRIEFING
             </button>
@@ -451,13 +461,25 @@ function Arsenal({ onClose }: { onClose: () => void }) {
             </article>
           ))}
         </div>
-        <h2 style={{ marginTop: "14px" }}>HOSTILE PARODY ROSTER</h2>
+        <h2 className="roster-heading">HOSTILE PARODY ROSTER</h2>
         <div className="codex">
           {invaderSpecs.map((spec) => (
-            <article key={spec.kind}>
-              <h3>
-                {spec.codeName} [{spec.insignia}]
-              </h3>
+            <article key={spec.kind} className="roster-card">
+              <div className="roster-head">
+                <div className="roster-thumb" style={{ borderColor: spec.accentColor }}>
+                  {spec.previewSprite ? (
+                    <img src={spec.previewSprite} alt={spec.codeName} />
+                  ) : (
+                    <span className="roster-insignia-glyph" style={{ color: spec.accentColor }}>
+                      {spec.insignia}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <h3>{spec.codeName}</h3>
+                  <span className="roster-meta">{spec.insignia}</span>
+                </div>
+              </div>
               <p>{spec.uniformSummary}</p>
             </article>
           ))}
@@ -478,53 +500,34 @@ function Manual({ onClose }: { onClose: () => void }) {
         <div className="codex">
           <div className="manual-step">
             <strong>1. MOVE</strong>
-            <p>
-              WASD or arrows on a keyboard. On a phone, drag the left stick. Weapons fire on their
-              own.
-            </p>
+            <p>WASD or arrows on a keyboard. On a phone, drag the left stick. Weapons fire on their own.</p>
           </div>
           <div className="manual-step">
             <strong>2. GOING FLANNEL</strong>
-            <p>
-              Space, or the red button. Pavel drops a stolen Indesit washing machine, sprints, and
-              takes no contact damage.
-            </p>
+            <p>Space, or the red button. Pavel drops a stolen Indesit washing machine, sprints, and takes no contact damage.</p>
           </div>
           <div className="manual-step">
             <strong>3. THEY WANT THE LOOT</strong>
-            <p>
-              Every invader sprints to the machine. Hold stealth to stack Article 5 overcharge.
-              Battery is the limit.
-            </p>
+            <p>Every invader sprints to the machine. Hold stealth to stack Article 5 overcharge. Battery is the limit.</p>
           </div>
           <div className="manual-step">
             <strong>4. THE AMBUSH</strong>
-            <p>
-              Press again. The machine explodes and every weapon dumps its bonus attack. Longer
-              stealth, bigger boom.
-            </p>
+            <p>Press again. The machine explodes and every weapon dumps its bonus attack. Longer stealth, bigger boom.</p>
           </div>
           <div className="manual-step">
             <strong>5. DOG TAGS &amp; PILSNER</strong>
-            <p>
-              Walk over blue-yellow tags to level up. Pilsner kegs heal, refill the battery, and
-              trigger 2x fire rage.
-            </p>
+            <p>Walk over blue-yellow tags to level up. Pilsner kegs heal, refill the battery, and trigger 2x fire rage.</p>
           </div>
           <div className="manual-step">
             <strong>6. THE INFLATABLE S-400</strong>
-            <p>
-              Every minute a glossy rubber balloon S-400 rolls in with an AliExpress tag. In
-              flannel, walk into it to pop it!
-            </p>
+            <p>Every minute a glossy rubber balloon S-400 rolls in with an AliExpress tag. In flannel, walk into it to pop it!</p>
           </div>
           <div className="manual-step">
             <strong>7. CONTEMPORARY INVADER PARODY &amp; COPE-CAGE DAMAGE</strong>
             <p>
-              Mobiks in three-stripe tracksuits &amp; Telnyashkas, Storm-Scooters with taped RPGs,
-              UAZ-452 Bukhanka vans armored with birch logs &amp; stolen carpets, MT-LB
-              Franken-tanks with 1950s 2M-3 naval ship turrets, Desertcross golf carts, and
-              Tsar-Mangal barn tanks. Below 50% HP, vehicle cope cages buckle and burst into flames!
+              Mobiks in three-stripe tracksuits &amp; Telnyashkas, Storm-Scooters with taped RPGs, UAZ-452 Bukhanka vans
+              armored with birch logs &amp; stolen carpets, MT-LB Franken-tanks with 1950s 2M-3 naval ship turrets,
+              Desertcross golf carts, and Tsar-Mangal barn tanks. Below 50% HP, vehicle cope cages buckle and burst into flames!
             </p>
           </div>
         </div>
@@ -558,8 +561,7 @@ function SettingsSheet({
           </button>
         </div>
         <p className="note settings-note">
-          Desktop: WASD to move, Space to go flannel. The A key moves left and D moves right. Phone:
-          landscape only, left stick plus the flannel button.
+          Desktop: WASD to move, Space to go flannel. The A key moves left and D moves right. Phone: landscape only, left stick plus the flannel button.
         </p>
         <button className="back" onClick={onClose}>
           CLOSE
@@ -575,6 +577,7 @@ function PlayChrome({
   offers,
   over,
   paused,
+  banner,
   onMute,
   onPause,
   onResume,
@@ -588,6 +591,7 @@ function PlayChrome({
   offers: UpgradeOffer[] | null;
   over: RunResult | null;
   paused: boolean;
+  banner: { text: string; color: string; id: number } | null;
   onMute: () => void;
   onPause: () => void;
   onResume: () => void;
@@ -614,122 +618,117 @@ function PlayChrome({
       <div className="hud-stack">
         <header className="hud">
           <div className="hud-card who">
-            <img src={portrait} alt="" />
-            <div>
-              <strong>FLANNEL STORM</strong>
-              <em>{stats?.stealth ? "FLANNEL MODE" : "GENERAL PAVEL"}</em>
-            </div>
+          <img src={portrait} alt="" />
+          <div>
+            <strong>FLANNEL STORM</strong>
+            <em>{stats?.stealth ? "FLANNEL MODE" : "GENERAL PAVEL"}</em>
           </div>
-          <div className="hud-card bars">
-            <div className="bar-line">
-              <span>HP</span>
-              <div className="track">
-                <i className="fill-hp" style={{ width: `${hpPct}%` }} />
-              </div>
-              <b>
-                {stats?.hp ?? 110}/{stats?.maxHp ?? 110}
-              </b>
-            </div>
-            <div className="bar-line">
-              <span>XP</span>
-              <div className="track">
-                <i className="fill-xp" style={{ width: `${xpPct}%` }} />
-              </div>
-              <b>LV {stats?.level ?? 1}</b>
-            </div>
-          </div>
-
-          {stats && stats.combo >= 3 ? (
-            <div className={`hud-card combo-badge ${stats.combo >= 25 ? "high" : ""}`}>
-              <span className="combo-fire">🔥</span>
-              <div>
-                <span className="combo-tag">
-                  {stats.combo >= 100
-                    ? "NUCLEAR"
-                    : stats.combo >= 50
-                      ? "HOLY FLANNEL"
-                      : stats.combo >= 25
-                        ? "UNSTOPPABLE"
-                        : stats.combo >= 10
-                          ? "RAMPAGE"
-                          : "STREAK"}
-                </span>
-                <b>{stats.combo} KILLS</b>
-              </div>
-            </div>
-          ) : null}
-
-          {stats && stats.beerRage > 0 ? (
-            <div className="hud-card meter rage-card">
-              <span>🍺 PILSNER RAGE</span>
-              <div className="track">
-                <i
-                  className="fill-rage"
-                  style={{ width: `${Math.min(100, (stats.beerRage / 5) * 100)}%` }}
-                />
-              </div>
-              <b>{stats.beerRage.toFixed(1)}s (2x FIRE)</b>
-            </div>
-          ) : null}
-
-          <div className="hud-card meter">
-            <span>WAVE {stats?.wave ?? 1}</span>
-            <b>{formatTime(stats?.time ?? 0)}</b>
-            <span>
-              {stats?.activeBoss
-                ? "⚠️ BOSS FIGHT!"
-                : (stats?.time ?? 0) >= 210 && (stats?.time ?? 0) < 300
-                  ? `FINALE ${formatTime(stats?.nextBoss ?? 0)}`
-                  : `BOSS ${formatTime(stats?.nextBoss ?? 0)}`}
-            </span>
-          </div>
-          <div className="hud-card meter">
-            <span>KILLS</span>
-            <b>{stats?.kills ?? 0}</b>
-          </div>
-          <div className="hud-card meter">
-            <span>STEALTH BATTERY</span>
+        </div>
+        <div className="hud-card bars">
+          <div className="bar-line">
+            <span>HP</span>
             <div className="track">
-              <i className="fill-bat" style={{ width: `${batPct}%` }} />
+              <i className="fill-hp" style={{ width: `${hpPct}%` }} />
             </div>
             <b>
-              {(stats?.battery ?? 5).toFixed(1)} / {(stats?.maxBattery ?? 5).toFixed(1)}s
+              {stats?.hp ?? 110}/{stats?.maxHp ?? 110}
             </b>
           </div>
-          <div
-            className={`hud-card meter ${stats?.overcharge && stats.overcharge > 0 ? "article5-active" : ""}`}
-          >
-            <span>ARTICLE 5</span>
+          <div className="bar-line">
+            <span>XP</span>
             <div className="track">
-              <i className="fill-ov" style={{ width: `${overPct}%` }} />
+              <i className="fill-xp" style={{ width: `${xpPct}%` }} />
             </div>
-            <b>x{(stats?.multiplier ?? 1).toFixed(2)}</b>
+            <b>LV {stats?.level ?? 1}</b>
           </div>
-          <div className="hud-actions">
-            <button
-              className="tiny"
-              tabIndex={-1}
-              onClick={(e) => {
-                e.currentTarget.blur();
-                onMute();
-              }}
-              aria-label={save.muted ? "Unmute" : "Mute"}
-            >
-              {save.muted ? <VolumeX /> : <Volume2 />}
-            </button>
-            <button
-              className="tiny"
-              tabIndex={-1}
-              onClick={(e) => {
-                e.currentTarget.blur();
-                if (paused) onResume();
-                else onPause();
-              }}
-              aria-label={paused ? "Resume" : "Pause"}
-            >
-              {paused ? <Play /> : <Pause />}
-            </button>
+        </div>
+
+        {stats && stats.combo >= 3 ? (
+          <div className={`hud-card combo-badge ${stats.combo >= 25 ? "high" : ""}`}>
+            <span className="combo-fire">🔥</span>
+            <div>
+              <span className="combo-tag">
+                {stats.combo >= 100
+                  ? "NUCLEAR"
+                  : stats.combo >= 50
+                    ? "HOLY FLANNEL"
+                    : stats.combo >= 25
+                      ? "UNSTOPPABLE"
+                      : stats.combo >= 10
+                        ? "RAMPAGE"
+                        : "STREAK"}
+              </span>
+              <b>{stats.combo} KILLS</b>
+            </div>
           </div>
+        ) : null}
+
+        {stats && stats.beerRage > 0 ? (
+          <div className="hud-card meter rage-card">
+            <span>🍺 PILSNER RAGE</span>
+            <div className="track">
+              <i className="fill-rage" style={{ width: `${Math.min(100, (stats.beerRage / 5) * 100)}%` }} />
+            </div>
+            <b>{stats.beerRage.toFixed(1)}s (2x FIRE)</b>
+          </div>
+        ) : null}
+
+        <div className="hud-card meter">
+          <span>WAVE {stats?.wave ?? 1}</span>
+          <b>{formatTime(stats?.time ?? 0)}</b>
+          <span>
+            {stats?.activeBoss
+              ? "⚠️ BOSS FIGHT!"
+              : (stats?.time ?? 0) >= 210 && (stats?.time ?? 0) < 300
+                ? `FINALE ${formatTime(stats?.nextBoss ?? 0)}`
+                : `BOSS ${formatTime(stats?.nextBoss ?? 0)}`}
+          </span>
+        </div>
+        <div className="hud-card meter">
+          <span>KILLS</span>
+          <b>{stats?.kills ?? 0}</b>
+        </div>
+        <div className="hud-card meter">
+          <span>STEALTH BATTERY</span>
+          <div className="track">
+            <i className="fill-bat" style={{ width: `${batPct}%` }} />
+          </div>
+          <b>
+            {(stats?.battery ?? 5).toFixed(1)} / {(stats?.maxBattery ?? 5).toFixed(1)}s
+          </b>
+        </div>
+        <div className={`hud-card meter ${stats?.overcharge && stats.overcharge > 0 ? "article5-active" : ""}`}>
+          <span>ARTICLE 5</span>
+          <div className="track">
+            <i className="fill-ov" style={{ width: `${overPct}%` }} />
+          </div>
+          <b>x{(stats?.multiplier ?? 1).toFixed(2)}</b>
+        </div>
+        <div className="hud-actions">
+          <button
+            className="tiny"
+            tabIndex={-1}
+            onClick={(e) => {
+              e.currentTarget.blur();
+              onMute();
+            }}
+            aria-label={save.muted ? "Unmute" : "Mute"}
+          >
+            {save.muted ? <VolumeX /> : <Volume2 />}
+          </button>
+          <button
+            className="tiny"
+            tabIndex={-1}
+            onClick={(e) => {
+              e.currentTarget.blur();
+              if (paused) onResume();
+              else onPause();
+            }}
+            aria-label={paused ? "Resume" : "Pause"}
+          >
+            {paused ? <Play /> : <Pause />}
+          </button>
+        </div>
         </header>
 
         {stats?.activeBoss ? (
@@ -737,8 +736,7 @@ function PlayChrome({
             <div className="boss-title">
               <span>{stats.activeBoss.name}</span>
               <b>
-                {stats.activeBoss.hp.toLocaleString()} / {stats.activeBoss.maxHp.toLocaleString()}{" "}
-                HP
+                {stats.activeBoss.hp.toLocaleString()} / {stats.activeBoss.maxHp.toLocaleString()} HP
               </b>
             </div>
             <div className="boss-track">
@@ -749,6 +747,18 @@ function PlayChrome({
                 }}
               />
             </div>
+          </div>
+        ) : null}
+
+        {banner ? (
+          <div
+            key={banner.id}
+            className="tactical-banner"
+            style={{ borderColor: banner.color, color: banner.color }}
+          >
+            <i className="banner-tick" style={{ background: banner.color }} />
+            <span>{banner.text}</span>
+            <i className="banner-tick" style={{ background: banner.color }} />
           </div>
         ) : null}
       </div>
@@ -765,11 +775,9 @@ function PlayChrome({
           bus.emit("toggle-stealth", null);
         }}
       >
-        <img
-          src={stats?.stealth ? "/sprites/portrait-stealth.png" : "/sprites/pavel-loud.png"}
-          alt=""
-        />
-        {stats?.stealth ? "ARTICLE 5 AMBUSH!" : "GOING FLANNEL"}
+        <img src={stats?.stealth ? "/sprites/portrait-stealth.png" : "/sprites/portrait-loud.png"} alt="" />
+        <span className="flannel-label">{stats?.stealth ? "ARTICLE 5!" : "FLANNEL"}</span>
+        <kbd className="flannel-key">SPACE</kbd>
       </button>
 
       {offers ? (
@@ -821,7 +829,7 @@ function PlayChrome({
               disabled={(stats?.rerolls ?? 0) <= 0}
               onClick={() => bus.emit("reroll-upgrade", null)}
             >
-              🎲 TACTICAL REROLL ({stats?.rerolls ?? 0} REMAINING)
+              🎲 TACTICAL REROLL ({(stats?.rerolls ?? 0)} REMAINING)
             </button>
           </div>
         </div>
@@ -845,9 +853,7 @@ function PlayChrome({
       {over ? (
         <div className="overlay-center">
           <div className="over-card">
-            <div className="rank-badge">
-              🎖️ {over.rankTitle || (over.victory ? "HERO OF UKRAINE" : "FRONT-LINE WARRIOR")}
-            </div>
+            <div className="rank-badge">🎖️ {over.rankTitle || (over.victory ? "HERO OF UKRAINE" : "FRONT-LINE WARRIOR")}</div>
             <h2>{over.victory ? "VICTORY IN UKRAINE!" : "PAVEL IS DOWN"}</h2>
             <p className="note">
               {over.victory

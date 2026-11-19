@@ -157,9 +157,7 @@ export class EnemySystem {
     if (this.prigozhinSprite?.active) {
       const e = this.ed(this.prigozhinSprite);
       return {
-        name: e.enraged
-          ? "🔥 BIG ZOMBIE PRIGOŽIN CLONE (ENRAGED) 🔥"
-          : "💀 BIG ZOMBIE PRIGOŽIN CLONE (WARLORD)",
+        name: e.enraged ? "🔥 BIG ZOMBIE PRIGOŽIN CLONE (ENRAGED) 🔥" : "💀 BIG ZOMBIE PRIGOŽIN CLONE (WARLORD)",
         kind: "prigozhin",
         hp: Math.max(0, Math.round(e.hp)),
         maxHp: Math.round(e.max),
@@ -291,16 +289,16 @@ export class EnemySystem {
       if (r < 0.48) return "cart";
       if (r < 0.64) return "dog";
       if (r < 0.78) return "kamikaze";
-      if (r < 0.9) return "mtlb";
+      if (r < 0.90) return "mtlb";
       return "tiktok";
     }
     if (t < 120) {
       // Wave 3 (60-120s): Heavy mechanized push - MT-LB Franken-tanks, Bukhankas, Riot Shields, Kamikaze drones, Turtle Tanks
       const r = Math.random();
-      if (r < 0.2) return "mtlb";
+      if (r < 0.20) return "mtlb";
       if (r < 0.38) return "bukhanka";
       if (r < 0.54) return "riot";
-      if (r < 0.7) return "kamikaze";
+      if (r < 0.70) return "kamikaze";
       if (r < 0.84) return "turtle";
       return "scooter";
     }
@@ -316,12 +314,12 @@ export class EnemySystem {
     }
     // Wave 5+ (180s - 300s+): Full contemporary parody combined-arms frenzy
     const r = Math.random();
-    if (r < 0.2) return "turtle";
+    if (r < 0.20) return "turtle";
     if (r < 0.38) return "mtlb";
     if (r < 0.52) return "bukhanka";
     if (r < 0.66) return "kamikaze";
     if (r < 0.78) return "riot";
-    if (r < 0.9) return "scooter";
+    if (r < 0.90) return "scooter";
     return "cart";
   }
 
@@ -401,28 +399,14 @@ export class EnemySystem {
     // Escort convoy: spawn riot shields and carts guarding the boss
     for (let i = 0; i < 5; i++) {
       const escortAng = (i / 5) * Math.PI * 2;
-      this.birth(
-        "riot",
-        clamp(x + Math.cos(escortAng) * 90, 120, 3600 - 120),
-        clamp(y + Math.sin(escortAng) * 90, 120, 3600 - 120),
-      );
-      this.birth(
-        "cart",
-        clamp(x + Math.cos(escortAng) * 135, 120, 3600 - 120),
-        clamp(y + Math.sin(escortAng) * 135, 120, 3600 - 120),
-      );
+      this.birth("riot", clamp(x + Math.cos(escortAng) * 90, 120, 3600 - 120), clamp(y + Math.sin(escortAng) * 90, 120, 3600 - 120));
+      this.birth("cart", clamp(x + Math.cos(escortAng) * 135, 120, 3600 - 120), clamp(y + Math.sin(escortAng) * 135, 120, 3600 - 120));
     }
 
     synth.siren();
     this.ctx.shakeCam(320, 0.015);
-    this.ctx.floater(
-      this.ctx.player.x,
-      this.ctx.player.y - 70,
-      "⚠️ WARNING: INFLATABLE S-400 DEPLOYED! ⚠️",
-      "#ff3333",
-    );
-    if (this.ctx.banner)
-      this.ctx.banner("INFLATABLE S-400 DETECTED — FLANNEL AMBUSH POPS IT!", "#ff3333");
+    this.ctx.floater(this.ctx.player.x, this.ctx.player.y - 70, "⚠️ WARNING: INFLATABLE S-400 DEPLOYED! ⚠️", "#ff3333");
+    if (this.ctx.banner) this.ctx.banner("INFLATABLE S-400 DETECTED — FLANNEL AMBUSH POPS IT!", "#ff3333");
   }
 
   spawnPrigozhin() {
@@ -447,36 +431,16 @@ export class EnemySystem {
     // Heavy Wagner Shockguard Honor Convoy
     for (let i = 0; i < 6; i++) {
       const escortAng = (i / 6) * Math.PI * 2;
-      this.birth(
-        "riot",
-        clamp(x + Math.cos(escortAng) * 110, 140, 3460),
-        clamp(y + Math.sin(escortAng) * 110, 140, 3460),
-      );
-      this.birth(
-        "kamikaze",
-        clamp(x + Math.cos(escortAng) * 150, 140, 3460),
-        clamp(y + Math.sin(escortAng) * 150, 140, 3460),
-      );
+      this.birth("riot", clamp(x + Math.cos(escortAng) * 110, 140, 3460), clamp(y + Math.sin(escortAng) * 110, 140, 3460));
+      this.birth("kamikaze", clamp(x + Math.cos(escortAng) * 150, 140, 3460), clamp(y + Math.sin(escortAng) * 150, 140, 3460));
     }
 
     synth.siren();
     synth.prigozhinRoar();
     this.ctx.shakeCam(450, 0.025);
-    this.ctx.floater(
-      this.ctx.player.x,
-      this.ctx.player.y - 85,
-      "🚨 FINALE: BIG ZOMBIE PRIGOŽIN CLONE! 🚨",
-      "#ff0054",
-    );
-    if (this.ctx.comic)
-      this.ctx.comic(
-        this.ctx.player.x,
-        this.ctx.player.y - 120,
-        "SHOIGU! GERASIMOV! WHERE IS THE AMMUNITION?!",
-        "#ff3333",
-      );
-    if (this.ctx.banner)
-      this.ctx.banner("⚠️ GRAND FINALE: BIG ZOMBIE PRIGOŽIN CLONE HAS ARRIVED! ⚠️", "#ff0054");
+    this.ctx.floater(this.ctx.player.x, this.ctx.player.y - 85, "🚨 FINALE: BIG ZOMBIE PRIGOŽIN CLONE! 🚨", "#ff0054");
+    if (this.ctx.comic) this.ctx.comic(this.ctx.player.x, this.ctx.player.y - 120, "SHOIGU! GERASIMOV! WHERE IS THE AMMUNITION?!", "#ff3333");
+    if (this.ctx.banner) this.ctx.banner("⚠️ GRAND FINALE: BIG ZOMBIE PRIGOŽIN CLONE HAS ARRIVED! ⚠️", "#ff0054");
   }
 
   birth(kind: Kind, x: number, y: number): Phaser.Physics.Arcade.Sprite | null {
@@ -526,19 +490,20 @@ export class EnemySystem {
                 ? 82
                 : kind === "cart"
                   ? 78
-                  : kind === "riot"
-                    ? 74
-                    : kind === "scooter"
-                      ? 72
-                      : kind === "kamikaze"
-                        ? 58
-                        : kind === "dog"
-                          ? 62
-                          : kind === "tiktok"
-                            ? 70
-                            : 68;
+                    : kind === "riot"
+                      ? 78
+                      : kind === "scooter"
+                        ? 72
+                        : kind === "kamikaze"
+                          ? 58
+                          : kind === "dog"
+                            ? 62
+                            : kind === "tiktok"
+                              ? 70
+                              : 68;
     const baseTex = KIND_TEX[kind];
-    const initTex = s.scene.textures.exists(`${baseTex}_0`) ? `${baseTex}_0` : baseTex;
+    const initDir = kind === "boss" ? "l" : "r";
+    const initTex = s.scene.textures.exists(`${baseTex}_${initDir}_0`) ? `${baseTex}_${initDir}_0` : baseTex;
     this.ctx.dress(
       s,
       initTex,
@@ -635,8 +600,9 @@ export class EnemySystem {
     shield = this.shields.get(enemy.x, enemy.y, "shield") as Phaser.GameObjects.Sprite | null;
     if (!shield) return;
     shield.setTexture("shield");
+    shield.setOrigin(0.5, 0.5);
     shield.setActive(true).setVisible(true);
-    shield.setScale(36 / Math.max(1, shield.height));
+    shield.setScale(76 / Math.max(1, shield.height));
     enemy.setData("shield", shield);
   }
 
@@ -655,7 +621,7 @@ export class EnemySystem {
       shield = enemy.getData("shield") as Phaser.GameObjects.Sprite | null;
     }
     if (!shield?.active) return;
-    shield.setPosition(enemy.x + Math.cos(data.aim) * 26, enemy.y + Math.sin(data.aim) * 26);
+    shield.setPosition(enemy.x, enemy.y - 4);
     shield.setRotation(data.aim);
     shield.setDepth(enemy.depth + 2);
   }
@@ -678,41 +644,13 @@ export class EnemySystem {
         const y = clamp(this.ctx.player.y + Math.sin(ang) * dist, 140, 3600 - 140);
         this.birth("tiktok", x, y);
       }
-      this.birth(
-        "scooter",
-        clamp(this.ctx.player.x - 240, 140, 3460),
-        clamp(this.ctx.player.y + 135, 140, 3460),
-      );
-      this.birth(
-        "scooter",
-        clamp(this.ctx.player.x + 225, 140, 3460),
-        clamp(this.ctx.player.y + 165, 140, 3460),
-      );
-      this.birth(
-        "bukhanka",
-        clamp(this.ctx.player.x - 295, 140, 3460),
-        clamp(this.ctx.player.y + 25, 140, 3460),
-      );
-      this.birth(
-        "mtlb",
-        clamp(this.ctx.player.x + 290, 140, 3460),
-        clamp(this.ctx.player.y - 45, 140, 3460),
-      );
-      this.birth(
-        "turtle",
-        clamp(this.ctx.player.x - 310, 140, 3460),
-        clamp(this.ctx.player.y - 120, 140, 3460),
-      );
-      this.birth(
-        "cart",
-        clamp(this.ctx.player.x + 305, 140, 3460),
-        clamp(this.ctx.player.y + 115, 140, 3460),
-      );
-      this.birth(
-        "riot",
-        clamp(this.ctx.player.x + 245, 140, 3460),
-        clamp(this.ctx.player.y - 155, 140, 3460),
-      );
+      this.birth("scooter", clamp(this.ctx.player.x - 240, 140, 3460), clamp(this.ctx.player.y + 135, 140, 3460));
+      this.birth("scooter", clamp(this.ctx.player.x + 225, 140, 3460), clamp(this.ctx.player.y + 165, 140, 3460));
+      this.birth("bukhanka", clamp(this.ctx.player.x - 295, 140, 3460), clamp(this.ctx.player.y + 25, 140, 3460));
+      this.birth("mtlb", clamp(this.ctx.player.x + 290, 140, 3460), clamp(this.ctx.player.y - 45, 140, 3460));
+      this.birth("turtle", clamp(this.ctx.player.x - 310, 140, 3460), clamp(this.ctx.player.y - 120, 140, 3460));
+      this.birth("cart", clamp(this.ctx.player.x + 305, 140, 3460), clamp(this.ctx.player.y + 115, 140, 3460));
+      this.birth("riot", clamp(this.ctx.player.x + 245, 140, 3460), clamp(this.ctx.player.y - 155, 140, 3460));
     }
 
     const timeSurvived = this.ctx.getTimeSurvived();
@@ -766,49 +704,24 @@ export class EnemySystem {
       if (rushPhase === 0 && t >= 12) {
         // K9 Attack Dog Pack!
         this.spawnBatch("dog", 5, cap);
-        this.ctx.floater(
-          this.ctx.player.x,
-          this.ctx.player.y - 45,
-          "🐕 K9 RECON PACK INBOUND!",
-          "#ffd6a0",
-        );
+        this.ctx.floater(this.ctx.player.x, this.ctx.player.y - 45, "🐕 K9 RECON PACK INBOUND!", "#ffd6a0");
       } else if (rushPhase === 1) {
         // Suicide Drone Kamikaze Swarm!
         this.spawnBatch("kamikaze", 8, cap);
-        this.ctx.floater(
-          this.ctx.player.x,
-          this.ctx.player.y - 45,
-          "⚡ KAMIKAZE SWARM DIVE!",
-          "#ff4d4d",
-        );
+        this.ctx.floater(this.ctx.player.x, this.ctx.player.y - 45, "⚡ KAMIKAZE SWARM DIVE!", "#ff4d4d");
       } else if (rushPhase === 2) {
         // Golf Cart Motorcade!
         this.spawnBatch("cart", 6, cap);
-        this.ctx.floater(
-          this.ctx.player.x,
-          this.ctx.player.y - 45,
-          "🏎️ GOLF CART MOTORCADE!",
-          "#ffd60a",
-        );
+        this.ctx.floater(this.ctx.player.x, this.ctx.player.y - 45, "🏎️ GOLF CART MOTORCADE!", "#ffd60a");
       } else if (rushPhase === 3) {
         // Shield Wall Phalanx!
         this.spawnBatch("riot", 6, cap);
-        this.ctx.floater(
-          this.ctx.player.x,
-          this.ctx.player.y - 45,
-          "🛡️ RIOT SHIELD PHALANX!",
-          "#64dfdf",
-        );
+        this.ctx.floater(this.ctx.player.x, this.ctx.player.y - 45, "🛡️ RIOT SHIELD PHALANX!", "#64dfdf");
       } else if (rushPhase === 4) {
         // Turtle Tank Squadron!
         this.spawnBatch("turtle", 4, cap);
         this.spawnBatch("kamikaze", 5, cap);
-        this.ctx.floater(
-          this.ctx.player.x,
-          this.ctx.player.y - 45,
-          "🐢 TURTLE TANK SQUADRON!",
-          "#72efdd",
-        );
+        this.ctx.floater(this.ctx.player.x, this.ctx.player.y - 45, "🐢 TURTLE TANK SQUADRON!", "#72efdd");
       }
     }
 
@@ -882,12 +795,7 @@ export class EnemySystem {
           this.ctx.shakeCam(320, 0.02);
           this.ctx.floater(s.x, s.y - 80, "🔥 ZOMBIE PRIGOŽIN ENRAGED! 🔥", "#ff0054");
           if (this.ctx.comic) {
-            this.ctx.comic(
-              s.x,
-              s.y - 110,
-              "SHOIGU! GERASIMOV! WHERE IS THE AMMUNITION?!",
-              "#ff3333",
-            );
+            this.ctx.comic(s.x, s.y - 110, "SHOIGU! GERASIMOV! WHERE IS THE AMMUNITION?!", "#ff3333");
           }
         }
 
@@ -931,19 +839,7 @@ export class EnemySystem {
           // Throw 2 explosive ammo crates
           for (let c = -1; c <= 1; c += 2) {
             const spread = ang + c * 0.16;
-            const crate = this.ctx.shoot(
-              s.x,
-              s.y,
-              spread,
-              180,
-              24 * this.pressure(),
-              1,
-              false,
-              "ammocrate",
-              2.2,
-              70,
-              false,
-            );
+            const crate = this.ctx.shoot(s.x, s.y, spread, 180, 24 * this.pressure(), 1, false, "ammocrate", 2.2, 70, false);
             crate?.setTint(e.enraged ? 0xff4422 : 0x88ff66);
           }
         }
@@ -956,11 +852,7 @@ export class EnemySystem {
             this.ctx.floater(s.x, s.y - 60, "☠️ WAGNER CHARGE! ☠️", "#00f5d4");
             for (let k = 0; k < 3; k++) {
               const sang = Math.random() * Math.PI * 2;
-              this.birth(
-                "kamikaze",
-                clamp(s.x + Math.cos(sang) * 80, 140, 3460),
-                clamp(s.y + Math.sin(sang) * 80, 140, 3460),
-              );
+              this.birth("kamikaze", clamp(s.x + Math.cos(sang) * 80, 140, 3460), clamp(s.y + Math.sin(sang) * 80, 140, 3460));
             }
             this.birth("riot", clamp(s.x + 60, 140, 3460), clamp(s.y, 140, 3460));
             this.birth("riot", clamp(s.x - 60, 140, 3460), clamp(s.y, 140, 3460));
@@ -969,6 +861,7 @@ export class EnemySystem {
       } else if (e.kind === "cart" && !lure) {
         vx = e.vx;
         vy = e.vy;
+        e.face = vx < 0 ? -1 : 1;
       } else if (e.kind === "scooter") {
         const weave = Math.sin(timeSurvived * 7.5 + e.id) * 0.32;
         const ang = Math.atan2(dy, dx) + weave;
@@ -1032,19 +925,7 @@ export class EnemySystem {
           e.face = vx < 0 ? -1 : 1;
         } else if (e.shoot <= 0) {
           const ang = Math.random() * Math.PI * 2;
-          const shot = this.ctx.shoot(
-            s.x,
-            s.y,
-            ang,
-            190,
-            13 * this.pressure(),
-            1,
-            false,
-            "bullet",
-            1.4,
-            0,
-            false,
-          );
+          const shot = this.ctx.shoot(s.x, s.y, ang, 190, 13 * this.pressure(), 1, false, "bullet", 1.4, 0, false);
           shot?.setTint(0xff5a36);
           e.shoot = 0.85 + Math.random() * 0.9;
         }
@@ -1087,19 +968,7 @@ export class EnemySystem {
         if (e.shoot <= 0) {
           e.shoot = 1.55;
           const ang = Math.atan2(py - s.y, px - s.x);
-          const shot = this.ctx.shoot(
-            s.x,
-            s.y,
-            ang,
-            150,
-            22 * this.pressure(),
-            1,
-            true,
-            "rocket",
-            5,
-            0,
-            false,
-          );
+          const shot = this.ctx.shoot(s.x, s.y, ang, 150, 22 * this.pressure(), 1, true, "rocket", 5, 0, false);
           shot?.setTint(0xff5533);
         }
       }
@@ -1108,33 +977,32 @@ export class EnemySystem {
       const body = s.body as Phaser.Physics.Arcade.Body;
       body.setVelocity(vx, vy);
 
-      // 2-Frame procedural walk / tread / rotor animation + <50% HP battle-damage state switching
+      // 2-Frame directional walk / tread / rotor animation + <50% HP battle-damage state switching
+      // Directional sprites (_r_0 / _l_0) have upright stencils baked in, so setFlipX stays false!
       const baseTex = KIND_TEX[e.kind];
-      const frameTex = getEnemyTextureKey(baseTex, e.kind, e.hp, e.max, timeSurvived, e.id);
+      const frameTex = getEnemyTextureKey(baseTex, e.kind, e.hp, e.max, timeSurvived, e.id, e.face);
       if (s.texture.key !== frameTex && s.scene.textures.exists(frameTex)) {
         s.setTexture(frameTex);
       }
 
+      s.setFlipX(false);
       if (e.kind === "kamikaze") {
-        s.setFlipX(false);
-        s.setRotation(e.aim);
+        // Keep 3/4 drone upright with subtle banking tilt instead of spinning upside-down
+        s.setRotation(clamp(vx * 0.0014, -0.22, 0.22));
       } else {
-        s.setFlipX(e.face < 0 && e.kind !== "boss");
-        const isVeh =
-          e.kind === "turtle" || e.kind === "cart" || e.kind === "bukhanka" || e.kind === "mtlb";
-        const gaitAmp = isVeh ? 0.025 : 0.045;
+        const isVeh = e.kind === "turtle" || e.kind === "cart" || e.kind === "bukhanka" || e.kind === "mtlb";
+        const gaitAmp = isVeh ? 0.02 : 0.04;
         s.setRotation(Math.sin(timeSurvived * 12 + e.id) * gaitAmp);
       }
 
-      // Vehicle diesel exhaust / burning smoke puffs (2.5x denser when damaged below 50% HP)
+      // Vehicle diesel exhaust / burning smoke puffs anchored to spec tailpipe/chimney coordinates
+      const spec = ENEMY_VISUAL_SPECS[e.kind];
       const isDamaged = e.max > 0 && e.hp / e.max < 0.5;
       const baseSmokeProb = e.kind === "turtle" || e.kind === "mtlb" ? 0.14 : 0.09;
-      if (
-        ENEMY_VISUAL_SPECS[e.kind].exhaustPuffs &&
-        Math.random() < baseSmokeProb * (isDamaged ? 2.5 : 1)
-      ) {
-        const exhaustX = s.x - e.face * (e.kind === "turtle" ? 24 : 26);
-        const exhaustY = e.kind === "turtle" || e.kind === "mtlb" ? s.y - 28 : s.y + 8;
+      if (spec.exhaustPuffs && Math.random() < baseSmokeProb * (isDamaged ? 2.5 : 1)) {
+        const dirSign = e.face < 0 ? -1 : 1;
+        const exhaustX = s.x + spec.exhaustOffsetX * dirSign;
+        const exhaustY = s.y + spec.exhaustOffsetY;
         this.ctx.puff?.(exhaustX, exhaustY, "smoke", isDamaged ? 0.62 : 0.45, s.y - 1);
       }
 
@@ -1158,8 +1026,7 @@ export class EnemySystem {
         let icon = loot;
         if (!icon || !icon.active || icon.texture.key !== key) {
           if (icon?.active) icon.setActive(false).setVisible(false);
-          icon =
-            (this.loots.get(s.x, s.y - 36, key) as Phaser.GameObjects.Sprite | null) ?? undefined;
+          icon = (this.loots.get(s.x, s.y - 36, key) as Phaser.GameObjects.Sprite | null) ?? undefined;
           if (icon) {
             icon.setTexture(key);
             icon.setActive(true).setVisible(true).setDepth(3600);
@@ -1196,26 +1063,20 @@ export class EnemySystem {
 
       const e = this.ed(s);
       const spec = ENEMY_VISUAL_SPECS[e.kind];
-      const footY = s.y + s.displayHeight * (e.kind === "kamikaze" ? 0.52 : 0.38);
+      const footY = s.y + s.displayHeight * spec.shadowOffsetY;
       shadowGfx.fillEllipse(s.x, footY, spec.shadowWidth, spec.shadowHeight);
 
-      // Crisp world-space health bar for damaged armored/vehicle units (Turtle Tank, Golf Cart, Riot Shield)
-      if (
-        spec.showHealthBar &&
-        e.kind !== "boss" &&
-        e.kind !== "prigozhin" &&
-        e.hp < e.max &&
-        e.hp > 0
-      ) {
-        const bw = e.kind === "turtle" ? 48 : 38;
+      // Crisp world-space health bar for damaged armored/vehicle units
+      if (spec.showHealthBar && e.kind !== "boss" && e.kind !== "prigozhin" && e.hp < e.max && e.hp > 0) {
+        const bw = e.kind === "turtle" || e.kind === "mtlb" ? 48 : 40;
         const bh = 5;
-        const bx = s.x - bw / 2;
-        const by = s.y - s.displayHeight * 0.56;
+        const bx = Math.round(s.x - bw / 2);
+        const by = Math.round(s.y - s.displayHeight * 0.54);
         const ratio = Math.max(0, Math.min(1, e.hp / e.max));
-        hudGfx.fillStyle(0x0b0f0a, 0.88);
+        hudGfx.fillStyle(0x0b0f0a, 0.9);
         hudGfx.fillRect(bx - 1, by - 1, bw + 2, bh + 2);
         hudGfx.fillStyle(ratio > 0.45 ? 0xffb703 : 0xe63946, 1);
-        hudGfx.fillRect(bx, by, bw * ratio, bh);
+        hudGfx.fillRect(bx, by, Math.round(bw * ratio), bh);
       }
     }
   }
@@ -1289,8 +1150,7 @@ export class EnemySystem {
 
     const prevHp = e.hp;
     e.hp -= finalDmg;
-    const isVeh =
-      e.kind === "turtle" || e.kind === "mtlb" || e.kind === "bukhanka" || e.kind === "cart";
+    const isVeh = e.kind === "turtle" || e.kind === "mtlb" || e.kind === "bukhanka" || e.kind === "cart";
     if (isVeh && prevHp >= e.max * 0.5 && e.hp > 0 && e.hp < e.max * 0.5) {
       this.ctx.floater(enemy.x, enemy.y - 34, "🔥 COPE CAGE BREACHED!", "#ff5400");
       this.ctx.puff?.(enemy.x, enemy.y - 12, "smoke", 0.55, enemy.y + 2);
@@ -1302,8 +1162,8 @@ export class EnemySystem {
       body.setVelocity(body.velocity.x + (kx / len) * push, body.velocity.y + (ky / len) * push);
     }
 
-    enemy.setTintFill(isCrit ? 0xffea00 : 0xffffff);
-    this.ctx.delayedCall(65, () => {
+    enemy.setTint(isCrit ? 0xffcc00 : 0xffffff);
+    this.ctx.delayedCall(80, () => {
       if (enemy.active) {
         if (e.kind === "prigozhin" && e.enraged) {
           enemy.setTint(0xff5533);
@@ -1420,8 +1280,7 @@ export class EnemySystem {
     }
 
     if (!isBoss) {
-      const highValue =
-        kind === "turtle" || kind === "mtlb" || kind === "bukhanka" || kind === "riot";
+      const highValue = kind === "turtle" || kind === "mtlb" || kind === "bukhanka" || kind === "riot";
       this.ctx.spawnGem(x, y, highValue ? 6 : 4);
       // Chance for a refreshing Pilsner keg drop
       if (Math.random() < (highValue ? 0.22 : 0.08)) {
@@ -1453,12 +1312,7 @@ export class EnemySystem {
     }
     if (e.kind === "riot") {
       if (isRiotFrontBlock(b.vx, b.vy, e.aim)) {
-        this.ctx.floater(
-          enemy.x + Math.cos(e.aim) * 18,
-          enemy.y + Math.sin(e.aim) * 18,
-          "BLOCK",
-          "#9ad7ff",
-        );
+        this.ctx.floater(enemy.x + Math.cos(e.aim) * 18, enemy.y + Math.sin(e.aim) * 18, "BLOCK", "#9ad7ff");
         if (b.pierce < 10) {
           this.ctx.recycle(bullet);
         }

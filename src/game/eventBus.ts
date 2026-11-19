@@ -17,6 +17,7 @@ export type BusMap = {
   "resume-game": null;
   "reroll-upgrade": null;
   "continue-endless": null;
+  "tactical-banner": { text: string; color: string } | null;
 };
 
 type Handler<T> = (payload: T) => void;

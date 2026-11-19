@@ -8,12 +8,20 @@ export interface EnemyVisualSpec {
   primaryColor: string;
   accentColor: string;
   insignia: string;
+  /** Natural horizontal facing of the original base artwork: 1 = right, -1 = left */
+  naturalFacing: 1 | -1;
   animFps: number;
   shadowWidth: number;
   shadowHeight: number;
+  shadowOffsetY: number;
   showHealthBar: boolean;
   exhaustPuffs: boolean;
+  /** Exhaust emission offset when facing RIGHT (flipped by e.face at runtime) */
+  exhaustOffsetX: number;
+  exhaustOffsetY: number;
   hasDamageState: boolean;
+  /** Optional static preview image for the Arsenal roster UI */
+  previewSprite?: string;
 }
 
 export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
@@ -26,12 +34,17 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#3d5234",
     accentColor: "#ff7700",
     insignia: "Z",
+    naturalFacing: 1,
     animFps: 7,
-    shadowWidth: 36,
-    shadowHeight: 14,
+    shadowWidth: 34,
+    shadowHeight: 12,
+    shadowOffsetY: 0.39,
     showHealthBar: false,
     exhaustPuffs: false,
+    exhaustOffsetX: 0,
+    exhaustOffsetY: 0,
     hasDamageState: false,
+    previewSprite: "/sprites/conscript.png",
   },
   tiktok: {
     kind: "tiktok",
@@ -42,27 +55,36 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#1f2421",
     accentColor: "#ff0055",
     insignia: "LIVE",
+    naturalFacing: -1,
     animFps: 8,
-    shadowWidth: 38,
-    shadowHeight: 14,
+    shadowWidth: 36,
+    shadowHeight: 12,
+    shadowOffsetY: 0.4,
     showHealthBar: false,
     exhaustPuffs: false,
+    exhaustOffsetX: 0,
+    exhaustOffsetY: 0,
     hasDamageState: false,
+    previewSprite: "/sprites/tiktok.png",
   },
   scooter: {
     kind: "scooter",
     codeName: "Storm-Scooter Assault Rider",
-    parodyTitle: "Mobik on Electric Xiaomi Kick-Scooter with Taped RPG-7",
+    parodyTitle: "Mobik on Electric Kick-Scooter with Taped RPG-7",
     uniformSummary:
-      "Tracksuit-clad Mobik in SSh-68 helmet balancing on a civilian electric kick-scooter with glowing neon-blue deck LEDs, stolen grocery basket on the stem, and a loaded RPG-7 warhead taped to the handlebars with Blue Isolenta.",
+      "Tracksuit-clad Mobik in SSh-68 helmet balancing on a civilian electric kick-scooter with glowing cyan deck LEDs, stolen supermarket basket on the stem, and a loaded RPG-7 warhead taped to the handlebars with Blue Isolenta.",
     primaryColor: "#2b384e",
     accentColor: "#00d4ff",
     insignia: "Z-SCOOT",
+    naturalFacing: 1,
     animFps: 14,
-    shadowWidth: 46,
-    shadowHeight: 16,
+    shadowWidth: 44,
+    shadowHeight: 14,
+    shadowOffsetY: 0.41,
     showHealthBar: false,
     exhaustPuffs: false,
+    exhaustOffsetX: 0,
+    exhaustOffsetY: 0,
     hasDamageState: false,
   },
   cart: {
@@ -74,12 +96,17 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#b59b63",
     accentColor: "#ffffff",
     insignia: "Z",
+    naturalFacing: -1,
     animFps: 12,
-    shadowWidth: 68,
-    shadowHeight: 24,
+    shadowWidth: 66,
+    shadowHeight: 22,
+    shadowOffsetY: 0.37,
     showHealthBar: true,
     exhaustPuffs: true,
+    exhaustOffsetX: -28,
+    exhaustOffsetY: 12,
     hasDamageState: true,
+    previewSprite: "/sprites/cart.png",
   },
   bukhanka: {
     kind: "bukhanka",
@@ -90,11 +117,15 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#4f6239",
     accentColor: "#d97706",
     insignia: "БУХАНКА Z",
+    naturalFacing: 1,
     animFps: 10,
-    shadowWidth: 78,
-    shadowHeight: 28,
+    shadowWidth: 74,
+    shadowHeight: 24,
+    shadowOffsetY: 0.38,
     showHealthBar: true,
     exhaustPuffs: true,
+    exhaustOffsetX: -32,
+    exhaustOffsetY: 16,
     hasDamageState: true,
   },
   mtlb: {
@@ -106,11 +137,15 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#4b5842",
     accentColor: "#94a3b8",
     insignia: "ВМФ Z",
+    naturalFacing: 1,
     animFps: 10,
-    shadowWidth: 84,
-    shadowHeight: 30,
+    shadowWidth: 80,
+    shadowHeight: 26,
+    shadowOffsetY: 0.39,
     showHealthBar: true,
     exhaustPuffs: true,
+    exhaustOffsetX: -22,
+    exhaustOffsetY: 4,
     hasDamageState: true,
   },
   turtle: {
@@ -122,12 +157,17 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#6e553e",
     accentColor: "#d9534f",
     insignia: "Z",
+    naturalFacing: -1,
     animFps: 10,
-    shadowWidth: 86,
-    shadowHeight: 30,
+    shadowWidth: 80,
+    shadowHeight: 26,
+    shadowOffsetY: 0.38,
     showHealthBar: true,
     exhaustPuffs: true,
+    exhaustOffsetX: -16,
+    exhaustOffsetY: -34,
     hasDamageState: true,
+    previewSprite: "/sprites/turtle.png",
   },
   riot: {
     kind: "riot",
@@ -138,28 +178,38 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#465342",
     accentColor: "#ffd60a",
     insignia: "ОМОН Z",
+    naturalFacing: -1,
     animFps: 6,
-    shadowWidth: 42,
-    shadowHeight: 16,
+    shadowWidth: 38,
+    shadowHeight: 14,
+    shadowOffsetY: 0.42,
     showHealthBar: true,
     exhaustPuffs: false,
+    exhaustOffsetX: 0,
+    exhaustOffsetY: 0,
     hasDamageState: true,
+    previewSprite: "/sprites/riot.png",
   },
   kamikaze: {
     kind: "kamikaze",
     codeName: "Geran-2 Moped Drone",
     parodyTitle: "Flying Lawnmower Drone with Blue-Isolenta Taped RPG Warhead",
     uniformSummary:
-      "Quad-rotor & delta hybrid drone with spinning rotor blur discs, white Z stencil, sputtering 2-stroke moped motor, and an explosive warhead strapped underneath with bright Blue Isolenta tape.",
+      "Quad-rotor suicide drone with spinning rotor blur discs, white Z stencil, sputtering 2-stroke moped motor, and an explosive warhead strapped underneath with bright Blue Isolenta tape.",
     primaryColor: "#262a2e",
     accentColor: "#1e90ff",
     insignia: "ГЕРАНЬ-2",
+    naturalFacing: 1,
     animFps: 18,
-    shadowWidth: 34,
-    shadowHeight: 12,
+    shadowWidth: 32,
+    shadowHeight: 11,
+    shadowOffsetY: 0.56,
     showHealthBar: false,
     exhaustPuffs: false,
+    exhaustOffsetX: 0,
+    exhaustOffsetY: 0,
     hasDamageState: false,
+    previewSprite: "/sprites/kamikaze.png",
   },
   dog: {
     kind: "dog",
@@ -170,12 +220,17 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#9c6b3b",
     accentColor: "#4a5d3a",
     insignia: "Z",
+    naturalFacing: -1,
     animFps: 11,
-    shadowWidth: 42,
-    shadowHeight: 14,
+    shadowWidth: 38,
+    shadowHeight: 13,
+    shadowOffsetY: 0.4,
     showHealthBar: false,
     exhaustPuffs: false,
+    exhaustOffsetX: 0,
+    exhaustOffsetY: 0,
     hasDamageState: false,
+    previewSprite: "/sprites/k9.png",
   },
   boss: {
     kind: "boss",
@@ -186,12 +241,17 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#429e38",
     accentColor: "#ff2a2a",
     insignia: "С-400 Z",
+    naturalFacing: -1,
     animFps: 5,
-    shadowWidth: 108,
-    shadowHeight: 38,
+    shadowWidth: 102,
+    shadowHeight: 34,
+    shadowOffsetY: 0.4,
     showHealthBar: true,
     exhaustPuffs: false,
+    exhaustOffsetX: 0,
+    exhaustOffsetY: 0,
     hasDamageState: true,
+    previewSprite: "/sprites/boss.png",
   },
   prigozhin: {
     kind: "prigozhin",
@@ -202,12 +262,17 @@ export const ENEMY_VISUAL_SPECS: Record<Kind, EnemyVisualSpec> = {
     primaryColor: "#5a6e4c",
     accentColor: "#39ff14",
     insignia: "ГДЕ БК?!",
+    naturalFacing: 1,
     animFps: 6,
-    shadowWidth: 116,
-    shadowHeight: 42,
+    shadowWidth: 108,
+    shadowHeight: 38,
+    shadowOffsetY: 0.41,
     showHealthBar: true,
     exhaustPuffs: false,
+    exhaustOffsetX: 0,
+    exhaustOffsetY: 0,
     hasDamageState: true,
+    previewSprite: "/sprites/prigozhin.png",
   },
 };
 
@@ -217,6 +282,10 @@ export function getEnemyAnimFrame(kind: Kind, timeSurvived: number, entityId: nu
   return (phase & 1) === 0 ? 0 : 1;
 }
 
+/**
+ * Returns the exact pre-baked directional + damage texture key so sprites never
+ * mirror text/stencils via setFlipX and always face their true travel direction.
+ */
 export function getEnemyTextureKey(
   baseTex: string,
   kind: Kind,
@@ -224,9 +293,11 @@ export function getEnemyTextureKey(
   maxHp: number,
   timeSurvived: number,
   entityId: number,
+  face: number = 1,
 ): string {
   const spec = ENEMY_VISUAL_SPECS[kind];
   const frameIdx = getEnemyAnimFrame(kind, timeSurvived, entityId);
+  const dir = kind === "boss" ? "l" : face < 0 ? "l" : "r";
   const isDamaged = spec.hasDamageState && maxHp > 0 && hp / maxHp < 0.5;
-  return isDamaged ? `${baseTex}_dmg_${frameIdx}` : `${baseTex}_${frameIdx}`;
+  return isDamaged ? `${baseTex}_dmg_${dir}_${frameIdx}` : `${baseTex}_${dir}_${frameIdx}`;
 }

@@ -3,12 +3,13 @@ import { synth } from "./audio";
 import { WEAPON_MAX_RANK } from "./catalog";
 import { bus } from "./eventBus";
 import { installUpgradedGraphics } from "./graphics/SpriteFactory";
-import { computeDamageMultipliers, computeRankTitle, computeWave } from "./rules";
+import { selectExplosionStyleForProjectile, type ExplosionStyle } from "./fx/explosionProfiles";
+import { computeDamageMultipliers, computeRankTitle, computeWave, resolveOverlapPartner } from "./rules";
 import { EnemySystem } from "./systems/EnemySystem";
 import { FxSystem } from "./systems/FxSystem";
 import { LootSystem } from "./systems/LootSystem";
 import { WeaponSystem } from "./systems/WeaponSystem";
-import type { BData, Stats, UpgradeId } from "./types";
+import type { BData, Kind, Stats, UpgradeId } from "./types";
 
 const WORLD = 3600;
 
@@ -77,6 +78,8 @@ export class GameScene extends Phaser.Scene {
   maxCombo = 0;
   comboTimer = 0;
   beerRage = 0;
+  private hitstopT = 0;
+  private hitstopCd = 0;
 
   fxSystem!: FxSystem;
   weaponSystem!: WeaponSystem;
@@ -115,6 +118,8 @@ export class GameScene extends Phaser.Scene {
     this.maxCombo = 0;
     this.comboTimer = 0;
     this.beerRage = 0;
+    this.hitstopT = 0;
+    this.hitstopCd = 0;
     this.blocks = [];
     this.joy = { x: 0, y: 0 };
     this.spaceWas = false;
@@ -189,7 +194,7 @@ export class GameScene extends Phaser.Scene {
     this.bullets = this.physics.add.group({ maxSize: 500, runChildUpdate: false });
     this.hostile = this.physics.add.group({ maxSize: 350, runChildUpdate: false });
     this.gems = this.physics.add.group({ maxSize: 500, runChildUpdate: false });
-    this.fx = this.add.group({ maxSize: 120, classType: Phaser.GameObjects.Sprite });
+    this.fx = this.add.group({ maxSize: 240, classType: Phaser.GameObjects.Sprite });
     this.loots = this.add.group({ maxSize: 150, classType: Phaser.GameObjects.Sprite });
     this.shields = this.add.group({ maxSize: 250, classType: Phaser.GameObjects.Sprite });
 
@@ -200,7 +205,7 @@ export class GameScene extends Phaser.Scene {
     cam.startFollow(this.player, true, 0.14, 0.14);
 
     // Initialize modular subsystems (creates canvas textures like "ring" and "shield" first!)
-    this.fxSystem = new FxSystem(this, this.fx);
+    this.fxSystem = new FxSystem(this, this.fx, (hitstopSec) => this.requestHitstop(hitstopSec));
     this.fxSystem.init();
 
     this.decoy = this.physics.add.sprite(-400, -400, "washer");
@@ -229,9 +234,9 @@ export class GameScene extends Phaser.Scene {
         critFloater: (x, y, dmg) => this.fxSystem.critFloater(x, y, dmg),
         comic: (x, y, txt, col) => this.fxSystem.comic(x, y, txt, col),
         banner: (txt, col) => this.fxSystem.banner(this.player.x, this.player.y, txt, col),
-        shockwave: (x, y, sc) => this.fxSystem.shockwave(x, y, sc),
+        shockwave: (x, y, sc, variant) => this.fxSystem.shockwave(x, y, sc, variant),
         puff: (x, y, key, life, depth) => this.fxSystem.puff(x, y, key, life, depth),
-        explode: (x, y, sc) => this.fxSystem.explode(x, y, sc),
+        explode: (x, y, sc, style) => this.fxSystem.explode(x, y, sc, style),
         recycle: (s) => this.recycle(s),
         spawnGem: (x, y, val, keg) => this.lootSystem.spawnGem(x, y, val, keg),
         onFinaleVictory: () => this.triggerVictory(),
@@ -287,7 +292,8 @@ export class GameScene extends Phaser.Scene {
       areaMul: () => this.areaMul(),
       shoot: (...args) => this.shoot(...args),
       aoe: (x, y, r, dmg, knk) => this.aoe(x, y, r, dmg, knk),
-      explode: (x, y, sc) => this.fxSystem.explode(x, y, sc),
+      explode: (x, y, sc, style) => this.fxSystem.explode(x, y, sc, style),
+      sparks: (x, y, cnt, cols) => this.fxSystem.sparks(x, y, cnt, cols),
       shakeCam: (dur, int) => this.shakeCam(dur, int),
       findNearestEnemy: (x, y, bossOk) => this.enemySystem.nearest(x, y, bossOk),
       getRandomLivingEnemy: () => {
@@ -374,17 +380,38 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.bullets, this.enemies, (a, b) => {
       this.enemySystem.onFriendlyHit(a as Phaser.Physics.Arcade.Sprite, b as Phaser.Physics.Arcade.Sprite);
     });
-    this.physics.add.overlap(this.hostile, this.player, (a) => {
-      const shot = a as Phaser.Physics.Arcade.Sprite;
-      const bd = shot.getData("bd") as BData;
+    this.physics.add.overlap(this.player, this.hostile, (a, b) => {
+      const shot = resolveOverlapPartner(
+        this.player,
+        a as Phaser.Physics.Arcade.Sprite,
+        b as Phaser.Physics.Arcade.Sprite,
+      );
+      if (!shot || !shot.active) return;
+      if (this.stealth) return;
+      const bd = shot.getData("bd") as BData | undefined;
       this.hurtPlayer(bd?.dmg ?? 8);
+      if (bd && bd.aoe > 0) {
+        const pStyle = selectExplosionStyleForProjectile(shot.texture.key);
+        this.fxSystem.explode(shot.x, shot.y, Math.max(0.85, bd.aoe / 44), pStyle);
+        synth.explodeSound(pStyle, 0.9);
+      }
       this.recycle(shot);
     });
-    this.physics.add.overlap(this.enemies, this.player, (enemy) => {
-      this.enemySystem.touchEnemy(enemy as Phaser.Physics.Arcade.Sprite);
+    this.physics.add.overlap(this.player, this.enemies, (a, b) => {
+      const enemy = resolveOverlapPartner(
+        this.player,
+        a as Phaser.Physics.Arcade.Sprite,
+        b as Phaser.Physics.Arcade.Sprite,
+      );
+      if (enemy) this.enemySystem.touchEnemy(enemy);
     });
-    this.physics.add.overlap(this.enemies, this.decoy, (enemy) => {
-      this.enemySystem.touchDecoy(enemy as Phaser.Physics.Arcade.Sprite);
+    this.physics.add.overlap(this.decoy, this.enemies, (a, b) => {
+      const enemy = resolveOverlapPartner(
+        this.decoy,
+        a as Phaser.Physics.Arcade.Sprite,
+        b as Phaser.Physics.Arcade.Sprite,
+      );
+      if (enemy) this.enemySystem.touchDecoy(enemy);
     });
     for (const block of this.blocks) this.physics.add.collider(this.player, block);
 
@@ -404,7 +431,19 @@ export class GameScene extends Phaser.Scene {
 
   update(_time: number, deltaMs: number) {
     if (!this.started || !this.alive) return;
-    const dt = Math.min(0.05, deltaMs / 1000);
+    const rawDt = Math.min(0.05, deltaMs / 1000);
+    if (this.hitstopCd > 0) this.hitstopCd = Math.max(0, this.hitstopCd - rawDt);
+
+    // Brief sim-level hitstop freeze on major explosions while FX & camera keep ticking live
+    if (this.hitstopT > 0) {
+      this.hitstopT -= rawDt;
+      this.fxSystem.tickFx(rawDt);
+      this.fxSystem.tickFloaters(rawDt);
+      this.renderBattlefieldOverlays();
+      return;
+    }
+
+    const dt = rawDt;
     this.timeSurvived += dt;
     this.syncBackground();
 
@@ -446,8 +485,14 @@ export class GameScene extends Phaser.Scene {
 
   triggerBeerRage(seconds: number) {
     this.beerRage = Math.max(this.beerRage, seconds);
-    this.fxSystem.shockwave(this.player.x, this.player.y, 2.5);
+    this.fxSystem.shockwave(this.player.x, this.player.y, 2.5, "ring_fire");
     this.shakeCam(150, 0.01);
+  }
+
+  requestHitstop(sec: number) {
+    if (!this.shakeOn || this.hitstopCd > 0) return;
+    this.hitstopT = Math.min(0.055, Math.max(this.hitstopT, sec));
+    this.hitstopCd = 0.24;
   }
 
   private bindBus() {
@@ -591,15 +636,37 @@ export class GameScene extends Phaser.Scene {
     };
     window.__flannel = {
       grantXp: (n: number) => this.lootSystem.addXp(n),
-      dump: () => ({
-        started: this.started,
-        x: this.player.x,
-        y: this.player.y,
-        hp: this.hp,
-        level: this.lootSystem.level,
-        kills: this.kills,
-        stealth: this.stealth,
-      }),
+      triggerExplosion: (style: ExplosionStyle, dx = 0, dy = 0, scale = 1.5) => {
+        const tx = this.player.x + dx;
+        const ty = this.player.y + dy;
+        this.fxSystem.explode(tx, ty, scale, style);
+        synth.explodeSound(style, scale);
+      },
+      spawnEnemy: (kind: Kind, dx = 120, dy = 0) => {
+        this.enemySystem.birth(kind, clamp(this.player.x + dx, 140, WORLD - 140), clamp(this.player.y + dy, 140, WORLD - 140));
+      },
+      fireHostileAtPlayer: (dmg = 12, key = "bullet", aoe = 0) => {
+        const sx = clamp(this.player.x + 70, 100, WORLD - 100);
+        const sy = this.player.y;
+        const ang = Math.atan2(this.player.y - sy, this.player.x - sx);
+        this.shoot(sx, sy, ang, 240, dmg, 1, false, key, 2.0, aoe, false);
+      },
+      dump: () => {
+        const body = this.player.body as Phaser.Physics.Arcade.Body | null;
+        return {
+          started: this.started,
+          x: this.player.x,
+          y: this.player.y,
+          hp: this.hp,
+          level: this.lootSystem.level,
+          kills: this.kills,
+          stealth: this.stealth,
+          playerActive: this.player.active,
+          playerVisible: this.player.visible,
+          bodyEnabled: !!body?.enable,
+          hostileActive: this.hostile.countActive(true),
+        };
+      },
     };
   }
 
@@ -626,10 +693,10 @@ export class GameScene extends Phaser.Scene {
         const target = key === "church" ? 150 : key === "ruin" ? 130 : 66;
         s.setScale(target / s.height);
         s.setDepth(y);
-        const body = s.body as Phaser.Physics.Arcade.StaticBody;
-        body.setSize(s.width * 0.34, s.height * 0.28);
-        body.setOffset(s.width * 0.33, s.height * 0.55);
         s.refreshBody();
+        const body = s.body as Phaser.Physics.Arcade.StaticBody;
+        body.setSize(s.displayWidth * 0.34, s.displayHeight * 0.28, false);
+        body.setOffset(s.displayWidth * 0.33, s.displayHeight * 0.55);
         this.blocks.push(s);
       } else {
         const s = this.add.image(x, y, key);
@@ -725,7 +792,14 @@ export class GameScene extends Phaser.Scene {
     const frameIdx = moving > 8 ? (Math.floor(this.timeSurvived * 9) & 1) : 0;
     const baseKey = this.stealth ? "pavel-stealth" : "pavel-loud";
     const key = this.textures.exists(`${baseKey}_${frameIdx}`) ? `${baseKey}_${frameIdx}` : baseKey;
-    if (this.player.texture.key !== key) this.dress(this.player, key, 80, 0.34);
+    if (this.player.texture.key !== key) {
+      const prevW = this.player.frame.width;
+      const prevH = this.player.frame.height;
+      this.player.setTexture(key);
+      if (this.player.frame.width !== prevW || this.player.frame.height !== prevH) {
+        this.dress(this.player, key, 80, 0.34);
+      }
+    }
     this.player.setFlipX(this.faceX < 0);
     this.player.setRotation(moving > 8 ? Math.sin(this.timeSurvived * 14) * 0.05 : 0);
     this.player.setDepth(this.player.y);
@@ -814,8 +888,7 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    this.fxSystem.explode(x, y, 1.8);
-    this.fxSystem.shockwave(x, y, 3.4);
+    this.fxSystem.explode(x, y, 1.85 + Math.min(0.8, stacks * 0.14), "ambush");
     this.aoe(x, y, 130 * area, 65 * mul, 280);
 
     if (this.lootSystem.ranks.lumberjack > 0) {
@@ -826,7 +899,7 @@ export class GameScene extends Phaser.Scene {
         18 * this.lootSystem.ranks.lumberjack * mul,
         320,
       );
-      this.fxSystem.shockwave(this.player.x, this.player.y, 2.5);
+      this.fxSystem.shockwave(this.player.x, this.player.y, 2.5, "ring_flannel");
     }
     this.weaponSystem.resetTimers();
     if (this.weaponSystem.has("artillery")) this.weaponSystem.barrage(x, y, area, mul);
@@ -948,7 +1021,12 @@ export class GameScene extends Phaser.Scene {
       const b = this.bd(s);
       b.life -= dt;
       if (b.life <= 0) {
-        if (b.aoe > 0 && b.friendly) this.aoe(s.x, s.y, b.aoe, b.dmg * 0.6, 40);
+        if (b.aoe > 0) {
+          const pStyle = selectExplosionStyleForProjectile(s.texture.key);
+          this.fxSystem.explode(s.x, s.y, Math.max(0.9, b.aoe / 44), pStyle);
+          synth.explodeSound(pStyle, 0.9);
+          if (b.friendly) this.aoe(s.x, s.y, b.aoe, b.dmg * 0.6, 40);
+        }
         this.recycle(s);
         continue;
       }
@@ -1013,6 +1091,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   recycle(s: Phaser.Physics.Arcade.Sprite) {
+    if (!s || s === this.player) return;
     s.disableBody(true, true);
   }
 
@@ -1021,9 +1100,8 @@ export class GameScene extends Phaser.Scene {
     this.alive = false;
     this.held.clear();
     this.spaceWas = false;
-    this.fxSystem.explode(this.player.x, this.player.y, 2.0);
-    this.fxSystem.shockwave(this.player.x, this.player.y, 3.0);
-    synth.boom(true);
+    this.fxSystem.explode(this.player.x, this.player.y, 2.2, "armor");
+    synth.explodeSound("armor", 2.2);
     const wave = computeWave(this.timeSurvived);
     const rankTitle = computeRankTitle(this.kills, false);
 
@@ -1048,12 +1126,13 @@ export class GameScene extends Phaser.Scene {
     synth.victory();
     this.shakeCam(420, 0.025);
 
-    // Glorious fireworks & confetti
+    // Glorious multi-color victory fireworks & confetti!
     for (let i = 0; i < 9; i++) {
       this.time.delayedCall(i * 170, () => {
         const ox = (Math.random() - 0.5) * 320;
         const oy = (Math.random() - 0.5) * 320;
-        this.fxSystem.explode(this.player.x + ox, this.player.y + oy, 2.4);
+        this.fxSystem.explode(this.player.x + ox, this.player.y + oy, 1.9, "firework");
+        synth.explodeSound("firework", 1.5);
         this.fxSystem.comic(this.player.x + ox, this.player.y + oy - 45, "⭐ FRONT LIBERATED! ⭐", "#00f5d4");
       });
     }
@@ -1119,7 +1198,22 @@ declare global {
     };
     __flannel?: {
       grantXp: (n: number) => void;
-      dump: () => { x: number; y: number; hp: number; level: number; kills: number; stealth: boolean };
+      triggerExplosion: (style: ExplosionStyle, dx?: number, dy?: number, scale?: number) => void;
+      spawnEnemy: (kind: Kind, dx?: number, dy?: number) => void;
+      fireHostileAtPlayer: (dmg?: number, key?: string, aoe?: number) => void;
+      dump: () => {
+        started: boolean;
+        x: number;
+        y: number;
+        hp: number;
+        level: number;
+        kills: number;
+        stealth: boolean;
+        playerActive: boolean;
+        playerVisible: boolean;
+        bodyEnabled: boolean;
+        hostileActive: number;
+      };
     };
   }
 }

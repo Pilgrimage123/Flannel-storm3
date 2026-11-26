@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import { synth } from "../audio";
+import type { ExplosionStyle } from "../fx/explosionProfiles";
 import type { Flame, Shell, WeaponId, WState } from "../types";
 
 export interface WeaponContext {
@@ -29,7 +30,8 @@ export interface WeaponContext {
     friendly?: boolean,
   ): Phaser.Physics.Arcade.Sprite | null;
   aoe(x: number, y: number, radius: number, damage: number, knock: number): void;
-  explode(x: number, y: number, scale: number): void;
+  explode(x: number, y: number, scale: number, style?: ExplosionStyle): void;
+  sparks?(x: number, y: number, count?: number, colors?: readonly number[]): void;
   shakeCam(duration: number, intensity: number): void;
   findNearestEnemy(x: number, y: number, bossOk: boolean): Phaser.Physics.Arcade.Sprite | null;
   getRandomLivingEnemy(): Phaser.Physics.Arcade.Sprite | null;
@@ -100,24 +102,33 @@ export class WeaponSystem {
       const p = 1 - Math.max(0, sh.life) / 0.42;
       sh.sprite.setPosition(sh.x, sh.y - (1 - p) * 110);
       if (sh.life <= 0) {
-        this.ctx.explode(sh.x, sh.y, 1.35);
+        const expScale = sh.r > 88 ? 1.85 : 1.45;
+        this.ctx.explode(sh.x, sh.y, expScale, "artillery");
         this.ctx.aoe(sh.x, sh.y, sh.r, sh.dmg, 130);
-        this.ctx.shakeCam(130, 0.009);
-        synth.boom(true);
+        this.ctx.shakeCam(sh.r > 88 ? 190 : 135, sh.r > 88 ? 0.013 : 0.009);
+        synth.explodeSound("artillery", expScale);
         sh.sprite.setActive(false).setVisible(false);
         this.shells.splice(i, 1);
       }
     }
 
-    // Tick thermobaric flame patches
+    // Tick thermobaric flame patches with crisp 3-frame pixel flicker & rising embers
+    const flameFrame = Math.floor(performance.now() * 0.012) % 3;
     for (let i = this.flames.length - 1; i >= 0; i--) {
       const f = this.flames[i]!;
       f.life -= dt;
       f.tick -= dt;
+      const texKey = `flame_${(flameFrame + i) % 3}`;
+      if (f.sprite.texture.key !== texKey && f.sprite.scene.textures.exists(texKey)) {
+        f.sprite.setTexture(texKey);
+      }
       f.sprite.setAlpha(Math.max(0, Math.min(1, f.life)));
       if (f.tick <= 0) {
         f.tick = 0.2;
         this.ctx.aoe(f.x, f.y, f.r, f.dps * 0.2, 16);
+        if (Math.random() < 0.38) {
+          this.ctx.sparks?.(f.x, f.y - 6, 2, [0xffd60a, 0xff5400, 0xfff3b0]);
+        }
       }
       if (f.life <= 0) {
         f.sprite.setActive(false).setVisible(false);
@@ -347,12 +358,16 @@ export class WeaponSystem {
       if (!fx) continue;
       const px = x + Math.cos(a) * dist;
       const py = y + Math.sin(a) * dist;
-      fx.setTexture("flame");
+      const flameKey = fx.scene.textures.exists("flame_0") ? "flame_0" : "flame";
+      fx.setTexture(flameKey);
       fx.clearTint();
       fx.setRotation(0);
       fx.setAlpha(1);
       fx.setActive(true).setVisible(true).setPosition(px, py).setDepth(6);
       fx.setScale(1.25 * area);
+      if (i % 2 === 0) {
+        this.ctx.explode(px, py, 0.95 * area, "vehicle");
+      }
       this.flames.push({
         sprite: fx,
         life: 3.2,

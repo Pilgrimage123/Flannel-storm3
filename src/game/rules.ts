@@ -97,3 +97,14 @@ export function rollUpgradeOffers(
     },
   ];
 }
+
+/**
+ * Safely identifies the non-target object in a Phaser Arcade Physics overlap/collider callback,
+ * guarding against Phaser's internal (group, sprite) -> (sprite, groupChild) argument swap.
+ */
+export function resolveOverlapPartner<T>(self: T, a: T, b: T): T | null {
+  if (a === self && b !== self) return b;
+  if (b === self && a !== self) return a;
+  return null;
+}
+

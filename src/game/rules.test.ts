@@ -8,6 +8,7 @@ import {
   computeWave,
   isRiotFrontBlock,
   nextXpNeed,
+  resolveOverlapPartner,
   rollUpgradeOffers,
 } from "./rules";
 import { PASSIVE_MAX_RANK, PASSIVES, WEAPON_MAX_RANK, WEAPONS } from "./catalog";
@@ -110,5 +111,16 @@ describe("game rules", () => {
     assert.equal(getEnemyTextureKey("bukhanka", "bukhanka", 49, 100, 0.1, 0, -1), "bukhanka_dmg_l_1");
     assert.equal(getEnemyTextureKey("scooter", "scooter", 20, 100, 0, 0, -1), "scooter_l_0");
     assert.equal(getEnemyTextureKey("boss", "boss", 40, 100, 0, 0, 1), "boss_dmg_l_0");
+  });
+
+  it("resolves the non-self partner from physics overlap callbacks regardless of argument order", () => {
+    const player = { id: "player" };
+    const shot = { id: "shot" };
+    const other = { id: "other" };
+
+    assert.equal(resolveOverlapPartner(player, player, shot), shot);
+    assert.equal(resolveOverlapPartner(player, shot, player), shot);
+    assert.equal(resolveOverlapPartner(player, player, player), null);
+    assert.equal(resolveOverlapPartner(player, shot, other), null);
   });
 });

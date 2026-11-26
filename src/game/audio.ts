@@ -94,6 +94,7 @@ export class Synth {
   private lastBoomTime = 0;
   private lastCritTime = 0;
   private lastShootTime = 0;
+  private lastStyleBoomTime = 0;
 
   shoot() {
     const now = typeof performance !== "undefined" ? performance.now() : Date.now();
@@ -112,14 +113,114 @@ export class Synth {
     const now = typeof performance !== "undefined" ? performance.now() : Date.now();
     if (!heavy && now - this.lastBoomTime < 40) return;
     this.lastBoomTime = now;
+    const jitter = 0.88 + Math.random() * 0.24;
     if (heavy) {
-      this.noise(0.55, 0.28, 900, 60);
-      this.tone(140, 0.45, "sawtooth", 0.16, 32);
-      this.tone(70, 0.5, "sine", 0.22, 28);
+      this.noise(0.55, 0.28, 900 * jitter, 60);
+      this.tone(140 * jitter, 0.45, "sawtooth", 0.16, 32);
+      this.tone(70 * jitter, 0.5, "sine", 0.22, 28);
     } else {
-      this.noise(0.35, 0.18, 600);
-      this.tone(90, 0.3, "sawtooth", 0.06, 40);
+      this.noise(0.32, 0.17, 620 * jitter, 120);
+      this.tone(92 * jitter, 0.28, "sawtooth", 0.065, 38);
     }
+  }
+
+  explodeSound(style: string, scale = 1) {
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const isMajor =
+      style === "armor" ||
+      style === "artillery" ||
+      style === "inflatable" ||
+      style === "ambush" ||
+      style === "finale" ||
+      style === "firework";
+    if (!isMajor && now - this.lastStyleBoomTime < 38) return;
+    this.lastStyleBoomTime = now;
+
+    const j = 0.86 + Math.random() * 0.28;
+    const vol = Math.min(1.25, 0.82 + scale * 0.15);
+
+    if (style === "armor") {
+      // Heavy tank cook-off: deep hull rupture + metallic turret clang + ammo crackles
+      this.noise(0.62, 0.28 * vol, 1100 * j, 55);
+      this.tone(135 * j, 0.48, "sawtooth", 0.17 * vol, 26);
+      this.tone(68 * j, 0.56, "sine", 0.24 * vol, 24);
+      this.tone(620 * j, 0.18, "triangle", 0.11, 210);
+      if (typeof window !== "undefined") {
+        for (let i = 1; i <= 2; i++) {
+          const id = window.setTimeout(() => {
+            const cj = 0.85 + Math.random() * 0.35;
+            this.noise(0.18, 0.14, 1500 * cj, 180);
+            this.tone(160 * cj, 0.14, "square", 0.07, 45);
+            this.timers = this.timers.filter((t) => t !== id);
+          }, i * 95);
+          this.timers.push(id);
+        }
+      }
+      return;
+    }
+
+    if (style === "vehicle") {
+      // Fuel tank ignition whoosh + gritty punch
+      this.noise(0.45, 0.23 * vol, 950 * j, 90);
+      this.tone(115 * j, 0.36, "sawtooth", 0.12 * vol, 34);
+      this.tone(320 * j, 0.14, "square", 0.06, 95);
+      return;
+    }
+
+    if (style === "artillery") {
+      // Earth-shaking 155mm crack + deep sub-bass rumble
+      this.noise(0.6, 0.27 * vol, 1450 * j, 50);
+      this.tone(155 * j, 0.42, "triangle", 0.19 * vol, 28);
+      this.tone(62 * j, 0.58, "sine", 0.25 * vol, 22);
+      return;
+    }
+
+    if (style === "shrapnel") {
+      // Snappy FPV / rocket crack + electric buzz
+      this.noise(0.24, 0.18 * vol, 2100 * j, 240);
+      this.tone(420 * j, 0.12, "sawtooth", 0.08 * vol, 85);
+      this.tone(980 * j, 0.07, "square", 0.05, 320);
+      return;
+    }
+
+    if (style === "inflatable") {
+      // Comical giant rubber balloon POP + deflating squeal + snaps
+      this.tone(860 * j, 0.26, "sine", 0.16, 95);
+      this.noise(0.28, 0.24, 1800 * j, 220);
+      this.tone(1320 * j, 0.18, "triangle", 0.09, 280);
+      if (typeof window !== "undefined") {
+        const id = window.setTimeout(() => {
+          this.tone(680, 0.22, "sawtooth", 0.08, 160);
+          this.noise(0.18, 0.15, 1400, 300);
+          this.timers = this.timers.filter((t) => t !== id);
+        }, 110);
+        this.timers.push(id);
+      }
+      return;
+    }
+
+    if (style === "ambush") {
+      this.ambush();
+      return;
+    }
+
+    if (style === "finale") {
+      this.noise(0.75, 0.3, 1200 * j, 45);
+      this.tone(110 * j, 0.65, "sawtooth", 0.22, 24);
+      this.tone(55 * j, 0.72, "sine", 0.26, 20);
+      return;
+    }
+
+    if (style === "firework") {
+      this.noise(0.32, 0.18, 2400 * j, 360);
+      this.tone(1100 * j, 0.14, "sine", 0.08, 420);
+      this.tone(1680 * j, 0.11, "triangle", 0.06, 760);
+      return;
+    }
+
+    // Standard infantry pop with randomized pitch so consecutive kills sound crisp & varied
+    this.noise(0.28, 0.16 * vol, 720 * j, 130);
+    this.tone(105 * j, 0.22, "sawtooth", 0.07 * vol, 36);
   }
 
   stealth() {

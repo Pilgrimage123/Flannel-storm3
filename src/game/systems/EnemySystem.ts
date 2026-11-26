@@ -1,5 +1,11 @@
 import * as Phaser from "phaser";
 import { synth } from "../audio";
+import {
+  selectExplosionStyleForEnemy,
+  selectExplosionStyleForProjectile,
+  type ExplosionStyle,
+  type ShockwaveVariant,
+} from "../fx/explosionProfiles";
 import { ENEMY_VISUAL_SPECS, getEnemyTextureKey } from "../graphics/parodyPalettes";
 import { computePressure, isRiotFrontBlock } from "../rules";
 import { SpatialGrid } from "../spatial/SpatialGrid";
@@ -34,9 +40,9 @@ export interface EnemyContext {
   critFloater?(x: number, y: number, damage: number): void;
   comic?(x: number, y: number, text: string, color: string): void;
   banner?(text: string, color: string): void;
-  shockwave?(x: number, y: number, scale: number): void;
+  shockwave?(x: number, y: number, scale: number, variant?: ShockwaveVariant): void;
   puff?(x: number, y: number, key: string, life: number, depth: number): void;
-  explode(x: number, y: number, scale: number): void;
+  explode(x: number, y: number, scale: number, style?: ExplosionStyle): void;
   recycle(sprite: Phaser.Physics.Arcade.Sprite): void;
   spawnGem(x: number, y: number, value: number, keg?: boolean): void;
   onKilled(): void;
@@ -822,12 +828,11 @@ export class EnemySystem {
           e.slamCd -= dt;
           if (e.slamCd <= 0) {
             e.slamCd = e.enraged ? 2.2 : 3.4;
-            synth.boom(true);
+            synth.explodeSound("finale", 1.8);
             this.ctx.shakeCam(260, 0.016);
             this.ctx.floater(s.x, s.y - 65, "⚡ SLEDGEHAMMER SLAM! ⚡", "#ffcc00");
             this.ctx.aoe(s.x, s.y, 160, 32 * this.pressure(), 250);
-            if (this.ctx.shockwave) this.ctx.shockwave(s.x, s.y, 2.8);
-            this.ctx.explode(s.x, s.y, 1.8);
+            this.ctx.explode(s.x, s.y, 1.85, "finale");
           }
         }
 
@@ -1082,7 +1087,7 @@ export class EnemySystem {
   }
 
   touchEnemy(enemy: Phaser.Physics.Arcade.Sprite) {
-    if (!enemy.active || !this.ctx.isAlive()) return;
+    if (!enemy?.active || enemy === this.ctx.player || enemy === this.ctx.decoy || !this.ctx.isAlive()) return;
     const e = this.ed(enemy);
     const isStealth = this.ctx.isStealth();
     const dashT = this.ctx.getDashT();
@@ -1132,7 +1137,7 @@ export class EnemySystem {
   }
 
   touchDecoy(enemy: Phaser.Physics.Arcade.Sprite) {
-    if (!this.ctx.decoy.active || !enemy.active) return;
+    if (!this.ctx.decoy.active || !enemy?.active || enemy === this.ctx.decoy || enemy === this.ctx.player) return;
     const e = this.ed(enemy);
     if (e.kind !== "cart" && e.kind !== "kamikaze") return;
     this.killEnemy(enemy, false);
@@ -1220,14 +1225,17 @@ export class EnemySystem {
 
     const isPrigozhin = kind === "prigozhin";
     const isBoss = kind === "boss" || isPrigozhin;
-    this.ctx.explode(x, y, isPrigozhin ? 4.5 : isBoss ? 2.8 : 1.1);
-    synth.boom(isBoss);
+    const isArmor = kind === "turtle" || kind === "mtlb";
+    const isVeh = kind === "bukhanka" || kind === "cart" || kind === "scooter";
+    const expStyle = selectExplosionStyleForEnemy(kind, popped);
+    const expScale = isPrigozhin ? 3.2 : isBoss ? 2.4 : isArmor ? 1.5 : isVeh ? 1.3 : kind === "kamikaze" ? 1.2 : 1.0;
+    this.ctx.explode(x, y, expScale, expStyle);
+    synth.explodeSound(expStyle, expScale);
     this.ctx.onKilled();
 
     if (isPrigozhin) {
       this.ctx.shakeCam(500, 0.035);
       synth.prigozhinRoar();
-      if (this.ctx.shockwave) this.ctx.shockwave(x, y, 4.5);
       this.ctx.floater(x, y - 70, "🏆 BIG ZOMBIE PRIGOŽIN DEFEATED! 🏆", "#ffd60a");
 
       // Grand loot shower!
@@ -1274,6 +1282,9 @@ export class EnemySystem {
       for (let m = -1; m <= 1; m += 2) {
         this.birth("conscript", clamp(x + m * 24, 140, 3460), clamp(y + 12, 140, 3460));
       }
+    } else if (kind === "turtle" || kind === "mtlb") {
+      this.ctx.aoe(x, y, 95, 34, 140);
+      this.ctx.shakeCam(150, 0.011);
     } else if (kind === "kamikaze") {
       this.ctx.aoe(x, y, 95, 26, 130);
       this.ctx.shakeCam(100, 0.008);
@@ -1321,7 +1332,12 @@ export class EnemySystem {
       dmg *= 2.15;
     }
     this.damageEnemy(enemy, dmg, b.vx, b.vy);
-    if (b.aoe > 0) this.ctx.aoe(enemy.x, enemy.y, b.aoe, b.dmg * 0.45, 30);
+    if (b.aoe > 0) {
+      const pStyle = selectExplosionStyleForProjectile(bullet.texture.key);
+      this.ctx.explode(enemy.x, enemy.y, Math.max(0.85, b.aoe / 42), pStyle);
+      synth.explodeSound(pStyle, 0.9);
+      this.ctx.aoe(enemy.x, enemy.y, b.aoe, b.dmg * 0.45, 30);
+    }
     if (b.hit.length >= b.pierce) this.ctx.recycle(bullet);
   }
 }
